@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SignalSafe.Core\SignalSafe.Core.csproj" />
+    <ProjectReference Include="..\SignalSafe.Excel\SignalSafe.Excel.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

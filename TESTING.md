@@ -95,6 +95,45 @@ P11 and P12 are the two ends of one crossover. S30 and S43 are for wrong-directi
 
 Expected routes: `S31(M)-S33`, `S31(M)-S43` (across the crossover), `S42(M)-S40`, `S42(M)-S30` (across the crossover), `S44(M)-S42`.
 
+The straight routes also call the other end of the crossover: `S31(M)-S33` needs P11 Normal **and** P12 Normal (shown as "crossover end"). Three conflicts are marked "opposing: head-on" because the two routes use a section in opposite directions.
+
+## 4b. Check control tables against a layout
+
+Each sample has example control tables in Excel with deliberate mistakes. Open them in Excel or Numbers to see the format, then run:
+
+```bash
+dotnet run --project src/SignalSafe.Cli -- check samples/westbrook-junction.json samples/westbrook-control-tables.xlsx --report westbrook-findings.xlsx
+```
+
+```bash
+dotnet run --project src/SignalSafe.Cli -- check samples/kestrel-lane-crossover.json samples/kestrel-control-tables.xlsx
+```
+
+Expected for Westbrook: **5 errors, 2 warnings**:
+
+| Rule | Route | Planted mistake |
+| --- | --- | --- |
+| R03 | S1(M)-S5 | P1 called Normal; the route needs Reverse |
+| R04 | S4(M)-S6 | T12 missing from SectionsClear |
+| R05 | S1(M)-S3 and S1(M)-S5 | Neither lists the other as conflicting (one finding each) |
+| R07 | S2(M)-S4 | No overlap listed |
+| R01 | S7(S)-S6 | Route missing from the tables |
+| R10 | S4(M)-S6 | "T21" typed instead of T12 ("Did you mean T12?") |
+
+Expected for Kestrel: **1 error**: R09, `S31(M)-S33` calls P11 Normal but not P12.
+
+Open `westbrook-findings.xlsx` to see the report: a Summary sheet, a Findings sheet (filterable) and the Derived routes.
+
+To start your own tables, draft them from a layout (then review and edit them), or get a blank template:
+
+```bash
+dotnet run --project src/SignalSafe.Cli -- draft samples/westbrook-junction.json my-tables.xlsx
+```
+
+```bash
+dotnet run --project src/SignalSafe.Cli -- template blank.xlsx
+```
+
 ## 5. Experiments to try
 
 Copy a sample first, so the original stays unchanged:
@@ -119,11 +158,27 @@ dotnet run --project src/SignalSafe.Cli -- my-test.json
 | Add a signal `{ "id": "S8", "type": "Main", "atNode": "J8", "protects": "T22" }` | No new route: S8 reads into the buffer stop |
 | Delete a comma or bracket | A clear "not valid JSON" message, not a crash |
 
+Control table experiments: draft `my-tables.xlsx` (command above), which gives **no findings**, then change one cell in Excel, save, and run `check samples/westbrook-junction.json my-tables.xlsx`.
+
+| Try this in `my-tables.xlsx` | Expected finding |
+| --- | --- |
+| Move P4 from PointsNormal to PointsReverse on S4(M)-S6 | R03 Point position (error) |
+| Delete T3 from SectionsClear on S1(M)-S3 | R04 Track clearance (error) |
+| Clear ConflictingRoutes on S4(M)-S6 | R05 Conflicting routes (error) |
+| Change Overlap on S2(M)-S4 to T10 | R07 Overlap (error) |
+| Delete the whole S7(S)-S6 row | R01 Missing route (warning) |
+| Change the Exit of S1(M)-S3 from S3 to S6 | R02 Impossible route (error), plus R01 because S1(M)-S3 is now missing |
+| Type "T5" as "T55" anywhere | R10 Data consistency, with a "Did you mean" hint |
+| Rename a RouteId (e.g. S1(M)-S5 to S1B) and use the new name in ConflictingRoutes | Still no findings: rows match by entrance and exit |
+| Delete the Exit heading | A clear message that a required column is missing |
+
 ## 6. What to look at as a signalling engineer
 
 - Are the routes the ones you would expect from the drawing? Any missing or extra?
 - Are the point positions right for each route, including trailing points?
-- Are the conflicting pairs right? Any you would add or remove?
+- Are the conflicting pairs right? Any you would add or remove? Are the head-on (opposing) ones right?
+- Are the finding messages clear enough for a designer to act on without asking?
+- Does the Excel template match how UK control tables are laid out well enough? What columns would you add?
 - Do the three MVP simplifications in the [README](README.md#current-simplifications) match UK practice well enough, or what should change first?
 
 ## 7. Sending feedback
@@ -136,6 +191,8 @@ dotnet test result (pass/fail, number of tests):
 
 Westbrook output correct? yes / no, details:
 Kestrel output correct? yes / no, details:
+Control table check: same findings as section 4b? yes / no, details:
+Findings report (Excel) readable? yes / no, details:
 
 Experiments: anything that did not behave as described?
 

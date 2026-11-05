@@ -38,6 +38,33 @@ public class CrossoverTests
     }
 
     [Fact]
+    public void Straight_route_calls_the_other_crossover_end_too()
+    {
+        var route = Route("S31(M)-S33");
+
+        route.Points.Should().Equal(new Dictionary<string, PointPosition>
+        {
+            ["P11"] = PointPosition.Normal,
+            ["P12"] = PointPosition.Normal,
+        });
+        route.LinkedPoints.Should().Equal("P12");
+        Route("S42(M)-S40").LinkedPoints.Should().Equal("P11");
+    }
+
+    [Fact]
+    public void Head_on_conflict_is_marked_as_opposing()
+    {
+        var conflicts = ConflictFinder.Find(Routes);
+
+        // Each of these pairs uses a section in opposite directions (T32 or T42).
+        conflicts.Where(c => c.Opposing).Select(c => $"{c.RouteA} x {c.RouteB}").Should().BeEquivalentTo(
+            "S31(M)-S33 x S42(M)-S30",
+            "S31(M)-S43 x S42(M)-S30",
+            "S31(M)-S43 x S42(M)-S40");
+        conflicts.Single(c => c.RouteA == "S31(M)-S33" && c.RouteB == "S31(M)-S43").Opposing.Should().BeFalse();
+    }
+
+    [Fact]
     public void Wrong_direction_move_crosses_from_the_Down_to_the_Up()
     {
         var route = Route("S42(M)-S30");

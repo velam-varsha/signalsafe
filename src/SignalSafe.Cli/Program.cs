@@ -1,77 +1,204 @@
-﻿using SignalSafe.Core.Domain;
+﻿using SignalSafe.Core.ControlTables;
+using SignalSafe.Core.Domain;
 using SignalSafe.Core.Layouts;
 using SignalSafe.Core.Routing;
+using SignalSafe.Core.Rules;
+using SignalSafe.Excel;
 
-// SignalSafe command line: checks a layout file and prints its routes and conflicts.
-// Usage: dotnet run --project src/SignalSafe.Cli -- samples/westbrook-junction.json
+// SignalSafe command line.
+//   check <layout.json>                              layout problems, routes and conflicts
+//   check <layout.json> <tables.xlsx> [--report r.xlsx]  also verify control tables against the layout
+//   template <out.xlsx>                              blank control table template
+//   draft <layout.json> <out.xlsx>                   control tables drafted from the layout
 
-if (args.Length != 1)
+const string Usage = """
+    SignalSafe command line
+
+      check <layout.json>                                  Show layout problems, routes and conflicts
+      check <layout.json> <tables.xlsx> [--report out.xlsx]  Also check control tables against the layout
+      template <out.xlsx>                                  Write a blank control table template
+      draft <layout.json> <out.xlsx>                       Draft control tables from the layout
+
+    Run from the repository folder, for example:
+      dotnet run --project src/SignalSafe.Cli -- check samples/westbrook-junction.json samples/westbrook-control-tables.xlsx
+    """;
+
+if (args.Length == 0)
 {
-    Console.WriteLine("Usage: dotnet run --project src/SignalSafe.Cli -- <layout.json>");
-    Console.WriteLine("Example: dotnet run --project src/SignalSafe.Cli -- samples/westbrook-junction.json");
+    Console.WriteLine(Usage);
     return 2;
 }
 
-var path = args[0];
-if (!File.Exists(path))
-{
-    Console.WriteLine($"File not found: {path}");
-    return 2;
-}
+// "dotnet run -- layout.json" (no command) still works, as in Week 1.
+var command = args[0].EndsWith(".json", StringComparison.OrdinalIgnoreCase) ? "check" : args[0].ToLowerInvariant();
+var rest = command == "check" && args[0].EndsWith(".json", StringComparison.OrdinalIgnoreCase) ? args : args[1..];
 
-Layout layout;
-try
+return command switch
 {
-    layout = LayoutLoader.FromFile(path);
-}
-catch (LayoutFormatException ex)
-{
-    Console.WriteLine(ex.Message);
-    return 1;
-}
+    "check" => Check(rest),
+    "template" => Template(rest),
+    "draft" => Draft(rest),
+    _ => Fail($"Unknown command \"{args[0]}\".\n\n{Usage}"),
+};
 
-Console.WriteLine($"Layout: {layout.Name}");
-Console.WriteLine($"{layout.Sections.Count} sections, {layout.Points.Count} points, {layout.Signals.Count} signals");
-Console.WriteLine();
-
-var issues = LayoutValidator.Validate(layout);
-if (issues.Count > 0)
+static int Check(string[] args)
 {
-    Console.WriteLine($"LAYOUT PROBLEMS ({issues.Count})");
-    foreach (var issue in issues)
-        Console.WriteLine($"  [{issue.Code}] {issue.Message}");
+    var reportIndex = Array.FindIndex(args, a => a == "--report");
+    string? reportPath = null;
+    if (reportIndex >= 0)
+    {
+        if (reportIndex + 1 >= args.Length)
+            return Fail("--report needs a file name, e.g. --report findings.xlsx");
+        reportPath = args[reportIndex + 1];
+        args = args.Where((_, i) => i != reportIndex && i != reportIndex + 1).ToArray();
+    }
+    if (args.Length is < 1 or > 2)
+        return Fail(Usage);
+
+    var layout = LoadLayout(args[0]);
+    if (layout is null)
+        return 1;
+
+    Console.WriteLine($"Layout: {layout.Name}");
+    Console.WriteLine($"{layout.Sections.Count} sections, {layout.Points.Count} points, {layout.Signals.Count} signals");
     Console.WriteLine();
-    Console.WriteLine("Fix these before routes can be derived reliably.");
-    return 1;
+
+    var issues = LayoutValidator.Validate(layout);
+    if (issues.Count > 0)
+    {
+        Console.WriteLine($"LAYOUT PROBLEMS ({issues.Count})");
+        foreach (var issue in issues)
+            Console.WriteLine($"  [{issue.Code}] {issue.Message}");
+        Console.WriteLine();
+        Console.WriteLine("Fix these before routes can be derived reliably.");
+        return 1;
+    }
+    Console.WriteLine("Layout check: OK");
+    Console.WriteLine();
+
+    var routes = RouteFinder.Derive(layout);
+    PrintRoutes(routes);
+    PrintConflicts(ConflictFinder.Find(routes));
+
+    if (args.Length == 1)
+        return 0;
+
+    var tablesPath = args[1];
+    if (!File.Exists(tablesPath))
+        return Fail($"File not found: {tablesPath}");
+
+    var table = ControlTableExcel.Read(tablesPath);
+    var findings = RuleEngine.Run(layout, table);
+    Console.WriteLine();
+    PrintFindings(table, findings);
+
+    if (reportPath is not null)
+    {
+        FindingsReport.Write(reportPath, layout, findings, routes, DateTimeOffset.Now);
+        Console.WriteLine();
+        Console.WriteLine($"Report written to {reportPath}");
+    }
+    return findings.Any(f => f.Severity == Severity.Error) ? 3 : 0;
 }
 
-Console.WriteLine("Layout check: OK");
-Console.WriteLine();
-
-var routes = RouteFinder.Derive(layout);
-Console.WriteLine($"ROUTES ({routes.Count})");
-foreach (var r in routes)
+static int Template(string[] args)
 {
-    var points = r.Points.Count == 0
-        ? "none"
-        : string.Join(", ", r.Points.OrderBy(p => p.Key, StringComparer.Ordinal).Select(p => $"{p.Key} {p.Value}"));
-    Console.WriteLine($"  {r.Id}");
-    Console.WriteLine($"      sections: {string.Join(", ", r.Sections)}");
-    Console.WriteLine($"      points:   {points}");
-    Console.WriteLine($"      overlap:  {string.Join(", ", r.Overlap)}");
+    if (args.Length != 1)
+        return Fail("Usage: template <out.xlsx>");
+    ControlTableExcel.Write(args[0], []);
+    Console.WriteLine($"Blank control table template written to {args[0]}");
+    return 0;
 }
-Console.WriteLine();
 
-var conflicts = ConflictFinder.Find(routes);
-Console.WriteLine($"CONFLICTING ROUTES ({conflicts.Count})");
-foreach (var c in conflicts)
+static int Draft(string[] args)
 {
-    var reasons = new List<string>();
-    if (c.SharedSections.Count > 0)
-        reasons.Add($"share {string.Join(", ", c.SharedSections)}");
-    if (c.OpposingPoints.Count > 0)
-        reasons.Add($"need {string.Join(", ", c.OpposingPoints)} in opposite positions");
-    Console.WriteLine($"  {c.RouteA}  x  {c.RouteB}   ({string.Join("; ", reasons)})");
+    if (args.Length != 2)
+        return Fail("Usage: draft <layout.json> <out.xlsx>");
+    var layout = LoadLayout(args[0]);
+    if (layout is null)
+        return 1;
+    var issues = LayoutValidator.Validate(layout);
+    if (issues.Count > 0)
+        return Fail($"The layout has {issues.Count} problem(s). Run \"check {args[0]}\" to see them.");
+
+    var rows = ControlTableBuilder.Draft(layout);
+    ControlTableExcel.Write(args[1], rows, $"Draft control tables for {layout.Name}, generated by SignalSafe. Review before use.");
+    Console.WriteLine($"Draft control tables with {rows.Count} routes written to {args[1]}");
+    return 0;
 }
 
-return 0;
+static Layout? LoadLayout(string path)
+{
+    if (!File.Exists(path))
+    {
+        Console.WriteLine($"File not found: {path}");
+        return null;
+    }
+    try
+    {
+        return LayoutLoader.FromFile(path);
+    }
+    catch (LayoutFormatException ex)
+    {
+        Console.WriteLine(ex.Message);
+        return null;
+    }
+}
+
+static void PrintRoutes(IReadOnlyList<DerivedRoute> routes)
+{
+    Console.WriteLine($"ROUTES ({routes.Count})");
+    foreach (var r in routes)
+    {
+        var points = r.Points.Count == 0
+            ? "none"
+            : string.Join(", ", r.Points.OrderBy(p => p.Key, StringComparer.Ordinal)
+                .Select(p => $"{p.Key} {p.Value}{(r.LinkedPoints.Contains(p.Key) ? " (crossover end)" : "")}"));
+        Console.WriteLine($"  {r.Id}");
+        Console.WriteLine($"      sections: {string.Join(", ", r.Sections)}");
+        Console.WriteLine($"      points:   {points}");
+        Console.WriteLine($"      overlap:  {string.Join(", ", r.Overlap)}");
+    }
+    Console.WriteLine();
+}
+
+static void PrintConflicts(IReadOnlyList<RouteConflict> conflicts)
+{
+    Console.WriteLine($"CONFLICTING ROUTES ({conflicts.Count})");
+    foreach (var c in conflicts)
+    {
+        var reasons = new List<string>();
+        if (c.Opposing)
+            reasons.Add("opposing: head-on");
+        if (c.SharedSections.Count > 0)
+            reasons.Add($"share {string.Join(", ", c.SharedSections)}");
+        if (c.OpposingPoints.Count > 0)
+            reasons.Add($"need {string.Join(", ", c.OpposingPoints)} in opposite positions");
+        Console.WriteLine($"  {c.RouteA}  x  {c.RouteB}   ({string.Join("; ", reasons)})");
+    }
+}
+
+static void PrintFindings(ControlTable table, IReadOnlyList<Finding> findings)
+{
+    var errors = findings.Count(f => f.Severity == Severity.Error);
+    var warnings = findings.Count - errors;
+    Console.WriteLine($"CONTROL TABLE CHECK: {table.Rows.Count} rows read, {errors} error(s), {warnings} warning(s)");
+    if (findings.Count == 0)
+    {
+        Console.WriteLine("  No findings. The control tables agree with the layout for all 10 rules.");
+        return;
+    }
+    foreach (var f in findings)
+    {
+        var tag = f.Severity == Severity.Error ? "ERROR  " : "WARNING";
+        Console.WriteLine($"  {tag} {f.RuleId} {f.RuleName}{(f.RouteId is null ? "" : $" · {f.RouteId}")}");
+        Console.WriteLine($"          {f.Message}");
+        Console.WriteLine($"          at: {f.Source?.ToString() ?? "derived from layout"}");
+    }
+}
+
+static int Fail(string message)
+{
+    Console.WriteLine(message);
+    return 2;
+}
