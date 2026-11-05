@@ -8,6 +8,9 @@ internal static class TestLayouts
     public static Layout Westbrook() =>
         LayoutLoader.FromFile(Path.Combine(AppContext.BaseDirectory, "Samples", "westbrook-junction.json"));
 
+    public static Layout KestrelLane() =>
+        LayoutLoader.FromFile(Path.Combine(AppContext.BaseDirectory, "Samples", "kestrel-lane-crossover.json"));
+
     /// <summary>A plain line: W -T1- A -T2- B -T3- E, with signal SA at A and SB at B, both reading east.</summary>
     public static Layout StraightLine() => new(
         "Straight line",

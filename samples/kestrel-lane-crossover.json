@@ -1,0 +1,34 @@
+{
+  // Kestrel Lane Crossover: an invented example layout for SignalSafe.
+  // Up Main runs west to east, Down Main runs east to west.
+  // A crossover (P11 on the Up, P12 on the Down) lets trains cross between the lines.
+  // S30 and S43 are signals for wrong-direction moves over the crossover.
+  // Not based on any real location.
+  "name": "Kestrel Lane Crossover (example)",
+  "sections": [
+    { "id": "T31", "endA": "UP-WEST",   "endB": "J31", "lengthM": 400 },
+    { "id": "T32", "endA": "J31",       "endB": "P11", "lengthM": 250 },
+    { "id": "T33", "endA": "P11",       "endB": "J33", "lengthM": 420 },
+    { "id": "T34", "endA": "J33",       "endB": "UP-EAST", "lengthM": 300 },
+    { "id": "TX",  "endA": "P11",       "endB": "P12", "lengthM": 60 },
+
+    { "id": "T40", "endA": "DOWN-WEST", "endB": "J40", "lengthM": 300 },
+    { "id": "T41", "endA": "J40",       "endB": "P12", "lengthM": 380 },
+    { "id": "T42", "endA": "P12",       "endB": "J42", "lengthM": 240 },
+    { "id": "T43", "endA": "J42",       "endB": "J43", "lengthM": 600 },
+    { "id": "T44", "endA": "J43",       "endB": "DOWN-EAST", "lengthM": 300 }
+  ],
+  "points": [
+    { "id": "P11", "toe": "T32", "normal": "T33", "reverse": "TX", "linkedWith": "P12" },
+    { "id": "P12", "toe": "T42", "normal": "T41", "reverse": "TX", "linkedWith": "P11" }
+  ],
+  "signals": [
+    { "id": "S31", "type": "Main", "atNode": "J31", "protects": "T32" },
+    { "id": "S33", "type": "Main", "atNode": "J33", "protects": "T34" },
+    { "id": "S44", "type": "Main", "atNode": "J43", "protects": "T43" },
+    { "id": "S42", "type": "Main", "atNode": "J42", "protects": "T42" },
+    { "id": "S40", "type": "Main", "atNode": "J40", "protects": "T40" },
+    { "id": "S30", "type": "Main", "atNode": "J31", "protects": "T31" },
+    { "id": "S43", "type": "Main", "atNode": "J42", "protects": "T43" }
+  ]
+}

@@ -42,6 +42,13 @@ public static class LayoutValidator
             }
             if (legs.Select(l => l.Item2).Distinct().Count() != 3)
                 issues.Add(new("L06", p.Id, $"Points {p.Id}: toe, normal and reverse must be three different sections."));
+            if (p.LinkedWith is { } partnerId)
+            {
+                if (!pointsById.TryGetValue(partnerId, out var partner))
+                    issues.Add(new("L12", p.Id, $"Points {p.Id} are linked with '{partnerId}', which is not a set of points."));
+                else if (partner.LinkedWith != p.Id)
+                    issues.Add(new("L13", p.Id, $"Points {p.Id} are linked with {partnerId}, but {partnerId} is not linked back to {p.Id}."));
+            }
         }
 
         // Every node that is not a set of points is a plain joint or line end: at most two sections may meet there.

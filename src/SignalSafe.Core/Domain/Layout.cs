@@ -31,8 +31,9 @@ public sealed record TrackSection(string Id, string EndA, string EndB, double Le
 /// <summary>
 /// A set of points. Its ID is also the node ID that its three sections connect to.
 /// A train arriving on the toe can go Normal or Reverse; a train arriving on a heel must leave by the toe.
+/// <paramref name="LinkedWith"/> names the other end of a crossover, which is always worked in the same position.
 /// </summary>
-public sealed record Points(string Id, string ToeSection, string NormalSection, string ReverseSection)
+public sealed record Points(string Id, string ToeSection, string NormalSection, string ReverseSection, string? LinkedWith = null)
 {
     public PointPosition? PositionFor(string heelSection) =>
         heelSection == NormalSection ? PointPosition.Normal

@@ -32,7 +32,7 @@ public static class LayoutLoader
         return new Layout(
             dto.Name ?? "Unnamed layout",
             (dto.Sections ?? []).Select(s => new TrackSection(s.Id ?? "", s.EndA ?? "", s.EndB ?? "", s.LengthM)).ToList(),
-            (dto.Points ?? []).Select(p => new Points(p.Id ?? "", p.Toe ?? "", p.Normal ?? "", p.Reverse ?? "")).ToList(),
+            (dto.Points ?? []).Select(p => new Points(p.Id ?? "", p.Toe ?? "", p.Normal ?? "", p.Reverse ?? "", string.IsNullOrWhiteSpace(p.LinkedWith) ? null : p.LinkedWith)).ToList(),
             (dto.Signals ?? []).Select(s => new Signal(s.Id ?? "", s.Type, s.AtNode ?? "", s.Protects ?? "")).ToList());
     }
 
@@ -40,7 +40,7 @@ public static class LayoutLoader
 
     private sealed record LayoutDto(string? Name, List<SectionDto>? Sections, List<PointsDto>? Points, List<SignalDto>? Signals);
     private sealed record SectionDto(string? Id, string? EndA, string? EndB, double LengthM);
-    private sealed record PointsDto(string? Id, string? Toe, string? Normal, string? Reverse);
+    private sealed record PointsDto(string? Id, string? Toe, string? Normal, string? Reverse, string? LinkedWith);
     private sealed record SignalDto(string? Id, SignalType Type, string? AtNode, string? Protects);
 }
 
