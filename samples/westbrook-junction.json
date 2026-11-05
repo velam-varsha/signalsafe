@@ -1,0 +1,35 @@
+{
+  // Westbrook Junction: an invented example layout for SignalSafe.
+  // Up Main runs west to east with a junction (P1) to the Millbrook branch.
+  // Down Main runs east to west with a siding (P4). Not based on any real location.
+  "name": "Westbrook Junction (example)",
+  "sections": [
+    { "id": "T1",  "endA": "UP-WEST",   "endB": "J1",  "lengthM": 400 },
+    { "id": "T2",  "endA": "J1",        "endB": "P1",  "lengthM": 220 },
+    { "id": "T3",  "endA": "P1",        "endB": "J3",  "lengthM": 380 },
+    { "id": "T4",  "endA": "J3",        "endB": "UP-EAST", "lengthM": 300 },
+    { "id": "T5",  "endA": "P1",        "endB": "J5",  "lengthM": 360 },
+    { "id": "T6",  "endA": "J5",        "endB": "BRANCH-EAST", "lengthM": 300 },
+
+    { "id": "T14", "endA": "DOWN-EAST", "endB": "J6",  "lengthM": 300 },
+    { "id": "T13", "endA": "J6",        "endB": "J4",  "lengthM": 520 },
+    { "id": "T12", "endA": "J4",        "endB": "P4",  "lengthM": 340 },
+    { "id": "T10", "endA": "P4",        "endB": "J7",  "lengthM": 280 },
+    { "id": "T9",  "endA": "J7",        "endB": "DOWN-WEST", "lengthM": 300 },
+    { "id": "T20", "endA": "P4",        "endB": "J8",  "lengthM": 120 },
+    { "id": "T22", "endA": "J8",        "endB": "SIDING-BUFFER", "lengthM": 150 }
+  ],
+  "points": [
+    { "id": "P1", "toe": "T2",  "normal": "T3",  "reverse": "T5" },
+    { "id": "P4", "toe": "T10", "normal": "T12", "reverse": "T20" }
+  ],
+  "signals": [
+    { "id": "S1", "type": "Main",  "atNode": "J1", "protects": "T2" },
+    { "id": "S3", "type": "Main",  "atNode": "J3", "protects": "T4" },
+    { "id": "S5", "type": "Main",  "atNode": "J5", "protects": "T6" },
+    { "id": "S2", "type": "Main",  "atNode": "J6", "protects": "T13" },
+    { "id": "S4", "type": "Main",  "atNode": "J4", "protects": "T12" },
+    { "id": "S6", "type": "Main",  "atNode": "J7", "protects": "T9" },
+    { "id": "S7", "type": "Shunt", "atNode": "J8", "protects": "T20" }
+  ]
+}
