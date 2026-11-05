@@ -48,9 +48,18 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (W
 dotnet test
 ```
 
+Check a layout and print its routes and conflicts:
+
+```bash
+dotnet run --project src/SignalSafe.Cli -- samples/westbrook-junction.json
+```
+
+See [TESTING.md](TESTING.md) for a step-by-step testing guide, drawings of the sample layouts and experiments to try.
+
 ## Project layout
 
 ```
+src/SignalSafe.Cli           Command-line tool for checking a layout file
 src/SignalSafe.Core          Core engine (no web or UI code)
   Domain/                    TrackSection, Points, Signal, Layout
   Layouts/                   JSON loader and layout validator
