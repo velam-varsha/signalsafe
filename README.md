@@ -28,7 +28,7 @@ flowchart LR
 | Week 1 | Core model, layout validation, route search, conflicts | Done (31 tests, 96% line coverage) |
 | Week 2 | Excel control table import, rules R01–R10, Excel findings report | Done (67 tests, 94% line coverage) |
 | Week 3 | ASP.NET Core API, React + TypeScript web app with interactive schematic | Done (86 .NET + 13 web tests) |
-| Week 4 | Route simulator, Docker, CI/CD, Azure deploy | Planned |
+| Week 4 | Route simulator, Docker, CI/CD, public deployment | Simulator and Docker done; deployment next |
 
 ## How it works
 
@@ -79,7 +79,17 @@ These are deliberate for the MVP and will be refined:
 
 ## Run it
 
-### Web app
+### Everything with Docker (one command)
+
+With [Docker Desktop](https://www.docker.com/products/docker-desktop/) running:
+
+```bash
+docker compose up --build
+```
+
+Open http://localhost:8080 for the web app and http://localhost:5080/swagger for the API documentation. Stop with Ctrl+C.
+
+### Web app for development
 
 Start the API, then the web app in a second terminal, and open http://localhost:5173:
 
@@ -137,7 +147,8 @@ src/SignalSafe.Core          Core engine (no web, UI or file-format code)
   Rules/                     Flank analysis, rule engine and rules R01-R10
 src/SignalSafe.Excel         Excel import/export (ClosedXML): template, reader, findings report
 src/SignalSafe.Api           ASP.NET Core API: check samples or uploads, reports, OpenAPI/Swagger
-frontend/                    React + TypeScript web app (Vite): schematic, findings, routes
+frontend/                    React + TypeScript web app (Vite): schematic, findings, routes, simulator
+docker-compose.yml           Runs the API and web app containers together
 tests/SignalSafe.Api.Tests   API tests (in-memory server)
 tools/make-samples.cs        Regenerates the example control tables
 .github/workflows/ci.yml     Build, format check, tests and coverage on every push

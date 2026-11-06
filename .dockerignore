@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+**/node_modules/
+frontend/dist/
+.git/
+.github/
+coverage/
+*.md
+!README.md
+/*.xlsx
+/my-*.json

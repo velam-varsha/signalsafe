@@ -74,7 +74,20 @@ The web app and the API are **two separate programs**, and each keeps running un
 | 1 | `dotnet run --project src/SignalSafe.Api` | The API server (C#) | http://localhost:5080 |
 | 2 | `cd frontend && npm run dev` | The web app development server (Vite) | http://localhost:5173 |
 
-You open the web app's address in the browser. When the page needs data, it asks the API. This split is how most real web products are built: the frontend and the backend can be developed, tested and hosted separately. In Week 4, Docker will start both with one command, and once deployed nobody needs a Terminal at all.
+You open the web app's address in the browser. When the page needs data, it asks the API. This split is how most real web products are built: the frontend and the backend can be developed, tested and hosted separately.
+
+**With Docker you need only one command.** `docker compose up --build` builds two containers (small, self-contained packages of each program and everything it needs) and starts them together:
+
+```mermaid
+flowchart LR
+    browser(["Browser<br/>localhost:8080"]) --> web
+    subgraph compose["docker compose up"]
+        web["web container<br/>nginx serves the page<br/>and forwards /api"] -- "/api requests" --> api["api container<br/>ASP.NET Core<br/>port 8080 inside"]
+    end
+    swagger(["Swagger<br/>localhost:5080/swagger"]) --> api
+```
+
+Once SignalSafe is deployed online, these same containers run in the cloud, and nobody needs a Terminal at all.
 
 ## 4. What happens when you open the web app
 
@@ -187,6 +200,8 @@ flowchart TD
 | Drawing maths: signal placement, labels, view box | [`src/diagram/geometry.ts`](../frontend/src/diagram/geometry.ts) |
 | Findings list, filters, rules passed | [`src/components/FindingsPanel.tsx`](../frontend/src/components/FindingsPanel.tsx) |
 | Routes list | [`src/components/RoutesPanel.tsx`](../frontend/src/components/RoutesPanel.tsx) |
+| **Route simulator logic** (set, lock, refuse, occupy) | [`src/sim/interlocking.ts`](../frontend/src/sim/interlocking.ts) |
+| Simulator panel (buttons, points status, event log) | [`src/components/SimulatorPanel.tsx`](../frontend/src/components/SimulatorPanel.tsx) |
 | Colours and layout | [`src/styles.css`](../frontend/src/styles.css) |
 | Dev server and API proxy | [`vite.config.ts`](../frontend/vite.config.ts) |
 
@@ -200,6 +215,9 @@ flowchart TD
 | API tests | [`tests/SignalSafe.Api.Tests/ApiTests.cs`](../tests/SignalSafe.Api.Tests/ApiTests.cs) |
 | Web app tests | [`frontend/src/App.test.tsx`](../frontend/src/App.test.tsx), [`frontend/src/diagram/geometry.test.ts`](../frontend/src/diagram/geometry.test.ts) |
 | Build and test on every push (GitHub Actions) | [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) |
+| API container | [`src/SignalSafe.Api/Dockerfile`](../src/SignalSafe.Api/Dockerfile) |
+| Web app container (nginx serves the page and forwards `/api`) | [`frontend/Dockerfile`](../frontend/Dockerfile), [`frontend/nginx.conf`](../frontend/nginx.conf) |
+| Start both containers together | [`docker-compose.yml`](../docker-compose.yml) |
 
 ## 7. How the projects depend on each other
 
@@ -230,6 +248,8 @@ Take these one at a time. Each step builds on the one before.
 | 6 | [`Rules/RuleTests.cs`](../tests/SignalSafe.Core.Tests/Rules/RuleTests.cs) | How each rule is proved: plant one mistake, expect one finding | 20 min |
 | 7 | [`Endpoints/CheckEndpoints.cs`](../src/SignalSafe.Api/Endpoints/CheckEndpoints.cs), then try the endpoints at http://localhost:5080/swagger | How the API wraps the engine | 30 min |
 | 8 | [`frontend/src/App.tsx`](../frontend/src/App.tsx), then [`Schematic.tsx`](../frontend/src/components/Schematic.tsx) | How the page asks the API and draws the answer | 45 min |
+| 9 | [`frontend/src/sim/interlocking.ts`](../frontend/src/sim/interlocking.ts) + its tests | How the simulator sets, locks and refuses routes | 30 min |
+| 10 | [`docker-compose.yml`](../docker-compose.yml) and the two Dockerfiles | How the app is packaged to run anywhere | 20 min |
 
 ## 9. Try the API yourself with Swagger
 

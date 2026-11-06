@@ -168,6 +168,29 @@ Open **http://localhost:5173** in your browser. Things to try:
 
 The API documentation is at **http://localhost:5080/swagger**: you can try each endpoint from there. Stop either server with **Ctrl+C**.
 
+### The route simulator
+
+Open the **Simulator** tab (Westbrook sample) and try:
+
+| Do this | What should happen |
+| --- | --- |
+| Set `S1(M)-S5` | P1 moves to Reverse and locks; after a moment S1 turns green and T2, T5 turn white |
+| Set `S1(M)-S3` | Refused: it conflicts with S1(M)-S5 (the log says why) |
+| Set `S2(M)-S4`, then click T13 on the diagram | T13 turns red (occupied) and S2 goes back to red |
+| Click T13 again | T13 clears and S2 turns green again |
+| Cancel `S1(M)-S5`, then set `S1(M)-S3` | Now allowed: P1 was released and moves back to Normal |
+| Kestrel sample: set `S31(M)-S43`, then `S42(M)-S30` | Refused: the two routes would meet head-on |
+
+### Or run everything with Docker
+
+If you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running, one command starts both the API and the web app (the first build takes a few minutes):
+
+```bash
+docker compose up --build
+```
+
+Then open **http://localhost:8080**. Stop it with **Ctrl+C**.
+
 ## 5. Experiments to try
 
 Copy a sample first, so the original stays unchanged:
@@ -228,6 +251,8 @@ Kestrel output correct? yes / no, details:
 Control table check: same findings as section 4b? yes / no, details:
 Findings report (Excel) readable? yes / no, details:
 Web app: highlights match the findings? Route previews right? Anything confusing?
+Simulator: did routes set, lock and refuse as described?
+Docker (if tried): did "docker compose up --build" work?
 
 Experiments: anything that did not behave as described?
 

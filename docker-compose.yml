@@ -1,0 +1,20 @@
+# Start SignalSafe with one command:   docker compose up --build
+# Then open http://localhost:8080 (web app) and http://localhost:5080/swagger (API documentation).
+# Stop it with Ctrl+C, or "docker compose down".
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: src/SignalSafe.Api/Dockerfile
+    ports:
+      - "5080:8080"
+    restart: unless-stopped
+
+  web:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    restart: unless-stopped

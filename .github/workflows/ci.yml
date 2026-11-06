@@ -54,3 +54,11 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+
+  docker:
+    name: Docker images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the API and web app images
+        run: docker compose build
