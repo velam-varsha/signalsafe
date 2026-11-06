@@ -30,5 +30,20 @@
     { "id": "S40", "type": "Main", "atNode": "J40", "protects": "T40" },
     { "id": "S30", "type": "Main", "atNode": "J31", "protects": "T31" },
     { "id": "S43", "type": "Main", "atNode": "J42", "protects": "T43" }
-  ]
+  ],
+  // Schematic drawing: each section is a line from its endA to its endB (drawing units, not metres).
+  "diagram": {
+    "sections": {
+      "T31": [[20,100],[150,100]],
+      "T32": [[150,100],[300,100]],
+      "T33": [[300,100],[600,100]],
+      "T34": [[600,100],[740,100]],
+      "TX": [[300,100],[400,200]],
+      "T40": [[20,200],[120,200]],
+      "T41": [[120,200],[400,200]],
+      "T42": [[400,200],[520,200]],
+      "T43": [[520,200],[650,200]],
+      "T44": [[650,200],[740,200]]
+    }
+  }
 }

@@ -47,9 +47,17 @@ public sealed record Points(string Id, string ToeSection, string NormalSection, 
 /// </summary>
 public sealed record Signal(string Id, SignalType Type, string AtNode, string Protects);
 
+/// <summary>A point on the schematic drawing, in drawing units (not metres).</summary>
+public sealed record DiagramPoint(double X, double Y);
+
 /// <summary>A complete track layout: the input to every check.</summary>
+/// <param name="Diagram">
+/// Optional schematic coordinates: for each section, a line from its EndA to its EndB.
+/// Only used for drawing; the checks never depend on it.
+/// </param>
 public sealed record Layout(
     string Name,
     IReadOnlyList<TrackSection> Sections,
     IReadOnlyList<Points> Points,
-    IReadOnlyList<Signal> Signals);
+    IReadOnlyList<Signal> Signals,
+    IReadOnlyDictionary<string, IReadOnlyList<DiagramPoint>>? Diagram = null);
