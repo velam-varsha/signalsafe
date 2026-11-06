@@ -6,6 +6,21 @@
 
 > Portfolio project. All layouts and tables in this repository are invented examples. SignalSafe is an advisory design-checking aid, **not** a certified safety system, and does not replace independent checking or formal verification.
 
+## Guides
+
+| Guide | Read it to... |
+| --- | --- |
+| [How SignalSafe works](docs/ARCHITECTURE.md) | See the big picture in diagrams, learn which file does what, and follow a suggested reading order |
+| [Testing guide](TESTING.md) | Run SignalSafe step by step, try experiments and send feedback |
+| [Web app](frontend/README.md) | Run and develop the React web app |
+
+```mermaid
+flowchart LR
+    web["Web app<br/>React + TypeScript"] -- "HTTP + JSON" --> api["Web API<br/>ASP.NET Core"]
+    cli["Command line"] --> engine
+    api --> engine["Engine<br/>C#: routes, conflicts, 10 rules<br/>+ Excel import/export"]
+```
+
 ## Status
 
 | Phase | Scope | Status |
