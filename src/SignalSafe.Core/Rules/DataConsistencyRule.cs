@@ -65,12 +65,13 @@ public sealed class DataConsistencyRule : IRule
         {
             var hint = SuggestionFor(id, known);
             yield return Warn(row, column,
-                $"{column} lists \"{id}\", which is not a {kind} in the layout.{(hint is null ? "" : $" Did you mean {hint}?")}");
+                $"{column} lists \"{id}\", which is not a {kind} in the layout.{(hint is null ? "" : $" Did you mean {hint}?")}",
+                hint is null ? [] : [hint]);
         }
     }
 
-    private Finding Warn(ControlTableRow row, string column, string message) =>
-        new(Id, Name, Severity.Warning, row.RouteId, [], message, row.Source.WithColumn(column));
+    private Finding Warn(ControlTableRow row, string column, string message, IReadOnlyList<string>? elements = null) =>
+        new(Id, Name, Severity.Warning, row.RouteId, elements ?? [], message, row.Source.WithColumn(column));
 
     /// <summary>Suggests a known ID one edit away (a typo or swapped characters), if there is exactly one.</summary>
     private static string? SuggestionFor(string id, HashSet<string> known)

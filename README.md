@@ -12,7 +12,7 @@
 | --- | --- | --- |
 | Week 1 | Core model, layout validation, route search, conflicts | Done (31 tests, 96% line coverage) |
 | Week 2 | Excel control table import, rules R01–R10, Excel findings report | Done (67 tests, 94% line coverage) |
-| Week 3 | ASP.NET Core API, React + TypeScript schematic | Planned |
+| Week 3 | ASP.NET Core API, React + TypeScript web app with interactive schematic | Done (86 .NET + 13 web tests) |
 | Week 4 | Route simulator, Docker, CI/CD, Azure deploy | Planned |
 
 ## How it works
@@ -64,6 +64,22 @@ These are deliberate for the MVP and will be refined:
 
 ## Run it
 
+### Web app
+
+Start the API, then the web app in a second terminal, and open http://localhost:5173:
+
+```bash
+dotnet run --project src/SignalSafe.Api
+```
+
+```bash
+cd frontend && npm install && npm run dev
+```
+
+The API documentation (Swagger) is at http://localhost:5080/swagger. The web app needs [Node.js 22](https://nodejs.org/) or later.
+
+### Tests and command line
+
 Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (Windows, macOS or Linux).
 
 ```bash
@@ -105,11 +121,30 @@ src/SignalSafe.Core          Core engine (no web, UI or file-format code)
   ControlTables/             Control table model and drafting from a layout
   Rules/                     Flank analysis, rule engine and rules R01-R10
 src/SignalSafe.Excel         Excel import/export (ClosedXML): template, reader, findings report
+src/SignalSafe.Api           ASP.NET Core API: check samples or uploads, reports, OpenAPI/Swagger
+frontend/                    React + TypeScript web app (Vite): schematic, findings, routes
+tests/SignalSafe.Api.Tests   API tests (in-memory server)
 tools/make-samples.cs        Regenerates the example control tables
 .github/workflows/ci.yml     Build, format check, tests and coverage on every push
 tests/SignalSafe.Core.Tests  xUnit tests
 samples/                     Invented example layouts
 ```
+
+## Roadmap: how SignalSafe can grow
+
+Real GB control tables carry much more than this MVP checks. The engine is built so each of these is an addition, not a rewrite: new data goes on the layout or control table model, and each new check is one more rule class with its own tests.
+
+| Area | What it would add |
+| --- | --- |
+| Train detection | Axle counter and track circuit sections as their own objects, with clearance points and fouling points |
+| Locking | Approach locking, route holding, sectional route release and their timings |
+| Signals | Aspect sequences (red, single yellow, double yellow, green), junction indicators, and checks against RIS-0703-CCS principles |
+| Overlaps | Overlap length in metres, swinging overlaps, points in the overlap |
+| Routes | Shunt and call-on routes, permissive moves, alternative paths between the same signals |
+| Control table formats | Column mapping for each company's or supplier's table style, and multi-sheet tables (routes, signals, points) |
+| Input | Importing scheme plans from DXF or CAD, a visual layout editor |
+| Output | Revision comparison (what changed between issues), PDF reports, comments on findings |
+| Configuration | User-defined rules in JSON or YAML, rule sets per project or standard |
 
 ## Standards context
 

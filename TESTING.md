@@ -134,6 +134,40 @@ dotnet run --project src/SignalSafe.Cli -- draft samples/westbrook-junction.json
 dotnet run --project src/SignalSafe.Cli -- template blank.xlsx
 ```
 
+## 4c. Try the web app
+
+You also need [Node.js 22](https://nodejs.org/) or later for the web app. Check it with:
+
+```bash
+node --version
+```
+
+Start the API in one Terminal window (leave it running):
+
+```bash
+dotnet run --project src/SignalSafe.Api
+```
+
+Start the web app in a second Terminal window (the first `npm install` takes a minute):
+
+```bash
+cd frontend && npm install && npm run dev
+```
+
+Open **http://localhost:5173** in your browser. Things to try:
+
+1. The Westbrook sample opens with the first finding (R03) selected: P1, T2 and T5 are highlighted in red on the diagram.
+2. Click each finding in turn and check the highlighted track, points and signals match the message.
+3. Click **Warnings 2** to filter, then **All 7** again.
+4. Click section **T12** on the diagram: the list shows only the 3 findings about T12. Click **Show all** to go back.
+5. Open the **Routes** tab and click a route: it is drawn in blue, the overlap dashed, the entrance signal turns green and the points show N or R.
+6. Switch the sample (top right) to **Kestrel Lane Crossover** and preview `S31(M)-S43` across the crossover.
+7. Click **Upload files** and choose your own `my-test.json` and `my-tables.xlsx` (from section 5).
+8. Click **Download report** and **Template** to get the Excel files.
+9. Make the browser window narrow and check the page still works (the diagram scrolls sideways).
+
+The API documentation is at **http://localhost:5080/swagger**: you can try each endpoint from there. Stop either server with **Ctrl+C**.
+
 ## 5. Experiments to try
 
 Copy a sample first, so the original stays unchanged:
@@ -193,6 +227,7 @@ Westbrook output correct? yes / no, details:
 Kestrel output correct? yes / no, details:
 Control table check: same findings as section 4b? yes / no, details:
 Findings report (Excel) readable? yes / no, details:
+Web app: highlights match the findings? Route previews right? Anything confusing?
 
 Experiments: anything that did not behave as described?
 

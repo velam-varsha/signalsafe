@@ -153,8 +153,9 @@ public class RuleTests
     {
         var findings = Check(Westbrook, With(Westbrook, "S4(M)-S6", r => r with { SectionsClear = ["T21", "T10"] }));
 
-        findings.Should().ContainSingle(f => f.RuleId == "R10")
-            .Which.Message.Should().Contain("Did you mean T12?");
+        var finding = findings.Should().ContainSingle(f => f.RuleId == "R10").Which;
+        finding.Message.Should().Contain("Did you mean T12?");
+        finding.Elements.Should().Equal("T12"); // so the likely section is highlighted on the diagram
     }
 
     [Fact]

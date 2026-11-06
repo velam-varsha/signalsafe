@@ -1,0 +1,567 @@
+{
+ "layout": {
+  "name": "Westbrook Junction (example)",
+  "sections": [
+   {
+    "id": "T1",
+    "endA": "UP-WEST",
+    "endB": "J1",
+    "lengthM": 400,
+    "line": [
+     [
+      20,
+      110
+     ],
+     [
+      170,
+      110
+     ]
+    ]
+   },
+   {
+    "id": "T2",
+    "endA": "J1",
+    "endB": "P1",
+    "lengthM": 220,
+    "line": [
+     [
+      170,
+      110
+     ],
+     [
+      290,
+      110
+     ]
+    ]
+   },
+   {
+    "id": "T3",
+    "endA": "P1",
+    "endB": "J3",
+    "lengthM": 380,
+    "line": [
+     [
+      290,
+      110
+     ],
+     [
+      560,
+      110
+     ]
+    ]
+   },
+   {
+    "id": "T4",
+    "endA": "J3",
+    "endB": "UP-EAST",
+    "lengthM": 300,
+    "line": [
+     [
+      560,
+      110
+     ],
+     [
+      740,
+      110
+     ]
+    ]
+   },
+   {
+    "id": "T5",
+    "endA": "P1",
+    "endB": "J5",
+    "lengthM": 360,
+    "line": [
+     [
+      290,
+      110
+     ],
+     [
+      350,
+      50
+     ],
+     [
+      560,
+      50
+     ]
+    ]
+   },
+   {
+    "id": "T6",
+    "endA": "J5",
+    "endB": "BRANCH-EAST",
+    "lengthM": 300,
+    "line": [
+     [
+      560,
+      50
+     ],
+     [
+      740,
+      50
+     ]
+    ]
+   },
+   {
+    "id": "T14",
+    "endA": "DOWN-EAST",
+    "endB": "J6",
+    "lengthM": 300,
+    "line": [
+     [
+      740,
+      200
+     ],
+     [
+      680,
+      200
+     ]
+    ]
+   },
+   {
+    "id": "T13",
+    "endA": "J6",
+    "endB": "J4",
+    "lengthM": 520,
+    "line": [
+     [
+      680,
+      200
+     ],
+     [
+      440,
+      200
+     ]
+    ]
+   },
+   {
+    "id": "T12",
+    "endA": "J4",
+    "endB": "P4",
+    "lengthM": 340,
+    "line": [
+     [
+      440,
+      200
+     ],
+     [
+      220,
+      200
+     ]
+    ]
+   },
+   {
+    "id": "T10",
+    "endA": "P4",
+    "endB": "J7",
+    "lengthM": 280,
+    "line": [
+     [
+      220,
+      200
+     ],
+     [
+      80,
+      200
+     ]
+    ]
+   },
+   {
+    "id": "T9",
+    "endA": "J7",
+    "endB": "DOWN-WEST",
+    "lengthM": 300,
+    "line": [
+     [
+      80,
+      200
+     ],
+     [
+      20,
+      200
+     ]
+    ]
+   },
+   {
+    "id": "T20",
+    "endA": "P4",
+    "endB": "J8",
+    "lengthM": 120,
+    "line": [
+     [
+      220,
+      200
+     ],
+     [
+      280,
+      260
+     ],
+     [
+      330,
+      260
+     ]
+    ]
+   },
+   {
+    "id": "T22",
+    "endA": "J8",
+    "endB": "SIDING-BUFFER",
+    "lengthM": 150,
+    "line": [
+     [
+      330,
+      260
+     ],
+     [
+      440,
+      260
+     ]
+    ]
+   }
+  ],
+  "points": [
+   {
+    "id": "P1",
+    "toe": "T2",
+    "normal": "T3",
+    "reverse": "T5",
+    "linkedWith": null
+   },
+   {
+    "id": "P4",
+    "toe": "T10",
+    "normal": "T12",
+    "reverse": "T20",
+    "linkedWith": null
+   }
+  ],
+  "signals": [
+   {
+    "id": "S1",
+    "type": "Main",
+    "atNode": "J1",
+    "protects": "T2"
+   },
+   {
+    "id": "S3",
+    "type": "Main",
+    "atNode": "J3",
+    "protects": "T4"
+   },
+   {
+    "id": "S5",
+    "type": "Main",
+    "atNode": "J5",
+    "protects": "T6"
+   },
+   {
+    "id": "S2",
+    "type": "Main",
+    "atNode": "J6",
+    "protects": "T13"
+   },
+   {
+    "id": "S4",
+    "type": "Main",
+    "atNode": "J4",
+    "protects": "T12"
+   },
+   {
+    "id": "S6",
+    "type": "Main",
+    "atNode": "J7",
+    "protects": "T9"
+   },
+   {
+    "id": "S7",
+    "type": "Shunt",
+    "atNode": "J8",
+    "protects": "T20"
+   }
+  ],
+  "hasDiagram": true
+ },
+ "layoutIssues": [],
+ "routes": [
+  {
+   "id": "S1(M)-S3",
+   "entrance": "S1",
+   "exit": "S3",
+   "isShunt": false,
+   "sections": [
+    "T2",
+    "T3"
+   ],
+   "points": {
+    "P1": "Normal"
+   },
+   "linkedPoints": [],
+   "overlap": [
+    "T4"
+   ],
+   "inTables": true
+  },
+  {
+   "id": "S1(M)-S5",
+   "entrance": "S1",
+   "exit": "S5",
+   "isShunt": false,
+   "sections": [
+    "T2",
+    "T5"
+   ],
+   "points": {
+    "P1": "Reverse"
+   },
+   "linkedPoints": [],
+   "overlap": [
+    "T6"
+   ],
+   "inTables": true
+  },
+  {
+   "id": "S2(M)-S4",
+   "entrance": "S2",
+   "exit": "S4",
+   "isShunt": false,
+   "sections": [
+    "T13"
+   ],
+   "points": {},
+   "linkedPoints": [],
+   "overlap": [
+    "T12"
+   ],
+   "inTables": true
+  },
+  {
+   "id": "S4(M)-S6",
+   "entrance": "S4",
+   "exit": "S6",
+   "isShunt": false,
+   "sections": [
+    "T12",
+    "T10"
+   ],
+   "points": {
+    "P4": "Normal"
+   },
+   "linkedPoints": [],
+   "overlap": [
+    "T9"
+   ],
+   "inTables": true
+  },
+  {
+   "id": "S7(S)-S6",
+   "entrance": "S7",
+   "exit": "S6",
+   "isShunt": true,
+   "sections": [
+    "T20",
+    "T10"
+   ],
+   "points": {
+    "P4": "Reverse"
+   },
+   "linkedPoints": [],
+   "overlap": [
+    "T9"
+   ],
+   "inTables": false
+  }
+ ],
+ "conflicts": [
+  {
+   "routeA": "S1(M)-S3",
+   "routeB": "S1(M)-S5",
+   "sharedSections": [
+    "T2"
+   ],
+   "opposingPoints": [
+    "P1"
+   ],
+   "opposing": false
+  },
+  {
+   "routeA": "S4(M)-S6",
+   "routeB": "S7(S)-S6",
+   "sharedSections": [
+    "T10"
+   ],
+   "opposingPoints": [
+    "P4"
+   ],
+   "opposing": false
+  }
+ ],
+ "tables": {
+  "fileName": "westbrook-control-tables.xlsx",
+  "rowCount": 4
+ },
+ "findings": [
+  {
+   "ruleId": "R03",
+   "ruleName": "Point position",
+   "severity": "Error",
+   "routeId": "S1(M)-S5",
+   "elements": [
+    "P1",
+    "T2",
+    "T5"
+   ],
+   "message": "P1 must be Reverse for S1(M)-S5, but the control table calls it Normal.",
+   "source": {
+    "sheet": "Routes",
+    "row": 3,
+    "column": "PointsNormal"
+   }
+  },
+  {
+   "ruleId": "R04",
+   "ruleName": "Track clearance",
+   "severity": "Error",
+   "routeId": "S4(M)-S6",
+   "elements": [
+    "T12"
+   ],
+   "message": "S4(M)-S6 runs over T12, but T12 is not listed as a section that must be clear.",
+   "source": {
+    "sheet": "Routes",
+    "row": 5,
+    "column": "SectionsClear"
+   }
+  },
+  {
+   "ruleId": "R05",
+   "ruleName": "Conflicting routes",
+   "severity": "Error",
+   "routeId": "S1(M)-S3",
+   "elements": [
+    "T2",
+    "P1"
+   ],
+   "message": "S1(M)-S3 and S1(M)-S5 both use T2 and need P1 in opposite positions, but S1(M)-S3 does not list S1(M)-S5 as a conflicting route.",
+   "source": {
+    "sheet": "Routes",
+    "row": 2,
+    "column": "ConflictingRoutes"
+   }
+  },
+  {
+   "ruleId": "R05",
+   "ruleName": "Conflicting routes",
+   "severity": "Error",
+   "routeId": "S1(M)-S5",
+   "elements": [
+    "T2",
+    "P1"
+   ],
+   "message": "S1(M)-S5 and S1(M)-S3 both use T2 and need P1 in opposite positions, but S1(M)-S5 does not list S1(M)-S3 as a conflicting route.",
+   "source": {
+    "sheet": "Routes",
+    "row": 3,
+    "column": "ConflictingRoutes"
+   }
+  },
+  {
+   "ruleId": "R07",
+   "ruleName": "Overlap",
+   "severity": "Error",
+   "routeId": "S2(M)-S4",
+   "elements": [
+    "S4",
+    "T12"
+   ],
+   "message": "No overlap is listed beyond exit signal S4. Expected overlap: T12.",
+   "source": {
+    "sheet": "Routes",
+    "row": 4,
+    "column": "Overlap"
+   }
+  },
+  {
+   "ruleId": "R01",
+   "ruleName": "Missing route",
+   "severity": "Warning",
+   "routeId": "S7(S)-S6",
+   "elements": [
+    "S7",
+    "S6",
+    "T20",
+    "T10",
+    "P4"
+   ],
+   "message": "The layout allows S7(S)-S6 over T20, T10 with P4 Reverse, but it is not in the control tables.",
+   "source": null
+  },
+  {
+   "ruleId": "R10",
+   "ruleName": "Data consistency",
+   "severity": "Warning",
+   "routeId": "S4(M)-S6",
+   "elements": [
+    "T12"
+   ],
+   "message": "SectionsClear lists \"T21\", which is not a section in the layout. Did you mean T12?",
+   "source": {
+    "sheet": "Routes",
+    "row": 5,
+    "column": "SectionsClear"
+   }
+  }
+ ],
+ "rules": [
+  {
+   "id": "R01",
+   "name": "Missing route",
+   "findingCount": 1
+  },
+  {
+   "id": "R02",
+   "name": "Impossible route",
+   "findingCount": 0
+  },
+  {
+   "id": "R03",
+   "name": "Point position",
+   "findingCount": 1
+  },
+  {
+   "id": "R04",
+   "name": "Track clearance",
+   "findingCount": 1
+  },
+  {
+   "id": "R05",
+   "name": "Conflicting routes",
+   "findingCount": 2
+  },
+  {
+   "id": "R06",
+   "name": "Opposing routes",
+   "findingCount": 0
+  },
+  {
+   "id": "R07",
+   "name": "Overlap",
+   "findingCount": 1
+  },
+  {
+   "id": "R08",
+   "name": "Flank protection",
+   "findingCount": 0
+  },
+  {
+   "id": "R09",
+   "name": "Crossover pairing",
+   "findingCount": 0
+  },
+  {
+   "id": "R10",
+   "name": "Data consistency",
+   "findingCount": 1
+  }
+ ],
+ "durationMs": 12.3
+}
