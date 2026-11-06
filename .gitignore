@@ -482,3 +482,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Local test files and reports (TESTING.md experiments)
+/*.xlsx
+/my-*.json
