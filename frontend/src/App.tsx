@@ -5,12 +5,16 @@ import type { CheckResult, SampleInfo } from './api/types'
 import { FindingsPanel } from './components/FindingsPanel'
 import { RoutesPanel } from './components/RoutesPanel'
 import { type Highlight, Schematic } from './components/Schematic'
+import { SimulatorPanel } from './components/SimulatorPanel'
+import { cancelRoute, completeRoute, initialState, requestRoute, signalAspect, type SimState, toggleOccupied } from './sim/interlocking'
 
 type Source =
   | { kind: 'sample'; id: string }
   | { kind: 'upload'; layout: File; tables: File | null }
 
-type Tab = 'findings' | 'routes'
+type Tab = 'findings' | 'routes' | 'sim'
+
+const SETTING_TIME_MS = 800
 
 const SAMPLE_FILES: Record<string, { layout: string; tables: string }> = {
   westbrook: { layout: 'westbrook-junction.json', tables: 'westbrook-control-tables.xlsx' },
@@ -31,6 +35,7 @@ export default function App() {
   const [uploadOpen, setUploadOpen] = useState(false)
   const [layoutFile, setLayoutFile] = useState<File | null>(null)
   const [tablesFile, setTablesFile] = useState<File | null>(null)
+  const [sim, setSim] = useState<SimState | null>(null)
 
   const showToast = useCallback((message: string) => {
     setToast(message)
@@ -42,6 +47,7 @@ export default function App() {
     try {
       const r = next.kind === 'sample' ? await checkSample(next.id) : await checkFiles(next.layout, next.tables)
       setResult(r)
+      setSim(initialState(r))
       setSource(next)
       setSelectedRoute(null)
       setElementFilter(null)
@@ -73,14 +79,36 @@ export default function App() {
       const f = result.findings[selectedFinding]
       return { kind: 'finding', severity: f.severity, elements: f.elements }
     }
+    if (tab === 'sim' && sim) {
+      const set = result.routes.filter((r) => sim.routes[r.id])
+      return {
+        kind: 'sim',
+        setSections: new Set(set.flatMap((r) => r.sections)),
+        overlapSections: new Set(set.flatMap((r) => r.overlap)),
+        occupied: new Set(sim.occupied),
+        points: sim.points,
+        locked: new Set(set.flatMap((r) => Object.keys(r.points))),
+        clearSignals: new Set(result.layout.signals.map((g) => g.id).filter((id) => signalAspect(sim, result, id) === 'clear')),
+      }
+    }
     if (tab === 'routes' && selectedRoute) {
       const route = result.routes.find((r) => r.id === selectedRoute)
       return route ? { kind: 'route', route } : null
     }
     return null
-  }, [result, tab, selectedFinding, selectedRoute])
+  }, [result, tab, selectedFinding, selectedRoute, sim])
+
+  const onSetRoute = (routeId: string) => {
+    if (!result) return
+    setSim((s) => (s ? requestRoute(s, result, routeId) : s))
+    window.setTimeout(() => setSim((s) => (s ? completeRoute(s, result, routeId) : s)), SETTING_TIME_MS)
+  }
 
   const onElementClick = (id: string) => {
+    if (tab === 'sim') {
+      if (result && sim && result.layout.sections.some((s) => s.id === id)) setSim(toggleOccupied(sim, result, id))
+      return
+    }
     if (!result?.tables) return
     setTab('findings')
     setSelectedFinding(null)
@@ -216,7 +244,7 @@ export default function App() {
           <section className="screen" aria-label="Track schematic">
             <div className="screen-head">
               <span className="loc">{result.layout.name}</span>
-              <span className="mode">{tab === 'findings' ? 'FINDINGS' : 'ROUTES'}</span>
+              <span className="mode">{tab === 'findings' ? 'FINDINGS' : tab === 'routes' ? 'ROUTES' : 'SIMULATOR'}</span>
             </div>
             <div className="svg-wrap">
               <Schematic
@@ -226,14 +254,24 @@ export default function App() {
                 onElementClick={onElementClick}
               />
             </div>
-            <div className="legend">
-              <span><i style={{ background: 'var(--vdu-track)' }} />Track</span>
-              <span><i style={{ background: 'var(--vdu-err)' }} />Error</span>
-              <span><i style={{ background: 'var(--vdu-warn)' }} />Warning</span>
-              <span><i style={{ background: 'var(--vdu-prev)' }} />Route preview</span>
-              <span><i className="dashed" />Overlap</span>
-              <span className="legend-hint">Click a section, signal or points to see its findings.</span>
-            </div>
+            {tab === 'sim' ? (
+              <div className="legend">
+                <span><i style={{ background: 'var(--vdu-track)' }} />Track</span>
+                <span><i style={{ background: 'var(--vdu-set)' }} />Route set</span>
+                <span><i className="dashed set" />Overlap</span>
+                <span><i style={{ background: 'var(--vdu-occ)' }} />Occupied</span>
+                <span className="legend-hint">Click a section to occupy or clear it.</span>
+              </div>
+            ) : (
+              <div className="legend">
+                <span><i style={{ background: 'var(--vdu-track)' }} />Track</span>
+                <span><i style={{ background: 'var(--vdu-err)' }} />Error</span>
+                <span><i style={{ background: 'var(--vdu-warn)' }} />Warning</span>
+                <span><i style={{ background: 'var(--vdu-prev)' }} />Route preview</span>
+                <span><i className="dashed" />Overlap</span>
+                <span className="legend-hint">Click a section, signal or points to see its findings.</span>
+              </div>
+            )}
           </section>
 
           <aside className="panel">
@@ -244,8 +282,19 @@ export default function App() {
               <button type="button" role="tab" className="tab" aria-selected={tab === 'routes'} onClick={() => setTab('routes')}>
                 Routes <span className="count neutral">{result.routes.length}</span>
               </button>
+              <button type="button" role="tab" className="tab" aria-selected={tab === 'sim'} onClick={() => setTab('sim')}>
+                Simulator
+              </button>
             </div>
-            {tab === 'findings' ? (
+            {tab === 'sim' && sim ? (
+              <SimulatorPanel
+                result={result}
+                state={sim}
+                onSet={onSetRoute}
+                onCancel={(id) => setSim(cancelRoute(sim, result, id))}
+                onReset={() => setSim(initialState(result))}
+              />
+            ) : tab === 'findings' ? (
               <FindingsPanel
                 result={result}
                 selected={selectedFinding}

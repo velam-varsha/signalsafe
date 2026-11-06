@@ -85,6 +85,26 @@ describe('App', () => {
     expect(screen.getByText('Missing')).toBeInTheDocument() // S7(S)-S6 is not in the tables
   })
 
+  it('sets a route in the simulator and refuses a conflicting one', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await screen.findByText('R03 · Point position')
+
+    await user.click(screen.getByRole('tab', { name: 'Simulator' }))
+    await user.click(screen.getByRole('button', { name: 'Set S1(M)-S5' }))
+
+    expect(screen.getByTestId('points-state-P1')).toHaveTextContent('P1 Reverse · locked by S1(M)-S5')
+    expect(await screen.findByText(/S1 cleared/, {}, { timeout: 2000 })).toBeInTheDocument()
+    expect(screen.getByTestId('section-T5')).toHaveAttribute('data-state', 'set')
+
+    await user.click(screen.getByRole('button', { name: 'Set S1(M)-S3' }))
+    expect(screen.getByText(/Refused S1\(M\)-S3: S1\(M\)-S3 conflicts with S1\(M\)-S5/)).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Track section T2' }))
+    expect(screen.getByTestId('section-T2')).toHaveAttribute('data-state', 'occ')
+    expect(screen.getByText(/T2 occupied. S1 returned to danger/)).toBeInTheDocument()
+  })
+
   it('shows a clear message when the API cannot be reached', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => { throw new TypeError('Failed to fetch') }))
     render(<App />)

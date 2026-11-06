@@ -3,9 +3,21 @@ import { useMemo } from 'react'
 import type { LayoutView, Route, Severity } from '../api/types'
 import { nodePositions, pathOf, pointsLabel, sectionLabel, signalGlyph, viewBoxOf } from '../diagram/geometry'
 
+/** What the simulator shows on the diagram. */
+export interface SimView {
+  kind: 'sim'
+  setSections: Set<string>
+  overlapSections: Set<string>
+  occupied: Set<string>
+  points: Record<string, 'Normal' | 'Reverse'>
+  locked: Set<string>
+  clearSignals: Set<string>
+}
+
 export type Highlight =
   | { kind: 'finding'; severity: Severity; elements: string[] }
   | { kind: 'route'; route: Route }
+  | SimView
   | null
 
 interface Props {
@@ -15,7 +27,7 @@ interface Props {
   onElementClick: (id: string) => void
 }
 
-type TrackState = '' | 'err' | 'warn' | 'prev' | 'ovl' | 'faded'
+type TrackState = '' | 'err' | 'warn' | 'prev' | 'ovl' | 'faded' | 'set' | 'ovlset' | 'occ'
 
 export function Schematic({ layout, highlight, selectedElement, onElementClick }: Props) {
   const nodes = useMemo(() => nodePositions(layout), [layout])
@@ -36,6 +48,12 @@ export function Schematic({ layout, highlight, selectedElement, onElementClick }
 
   const stateOf = (id: string): TrackState => {
     if (!highlight) return ''
+    if (highlight.kind === 'sim') {
+      if (highlight.occupied.has(id)) return 'occ'
+      if (highlight.setSections.has(id)) return 'set'
+      if (highlight.overlapSections.has(id)) return 'ovlset'
+      return ''
+    }
     if (highlight.kind === 'finding') {
       if (!highlight.elements.includes(id)) return 'faded'
       return highlight.severity === 'Error' ? 'err' : 'warn'
@@ -48,6 +66,7 @@ export function Schematic({ layout, highlight, selectedElement, onElementClick }
   const isMarked = (id: string): boolean => {
     if (selectedElement === id) return true
     if (highlight?.kind === 'finding') return highlight.elements.includes(id)
+    if (highlight?.kind === 'sim') return false
     if (highlight?.kind === 'route') {
       const r = highlight.route
       return r.entrance === id || r.exit === id || id in r.points
@@ -60,7 +79,9 @@ export function Schematic({ layout, highlight, selectedElement, onElementClick }
     : 'var(--vdu-prev)'
 
   const routePosition = (pointsId: string) =>
-    highlight?.kind === 'route' ? highlight.route.points[pointsId] : undefined
+    highlight?.kind === 'route' ? highlight.route.points[pointsId]
+      : highlight?.kind === 'sim' ? highlight.points[pointsId]
+        : undefined
 
   return (
     <svg
@@ -77,7 +98,9 @@ export function Schematic({ layout, highlight, selectedElement, onElementClick }
         const label = sectionLabel(s)
         return (
           <g key={s.id} data-testid={`section-${s.id}`} data-state={state || 'idle'}>
-            {(state === 'err' || state === 'warn' || state === 'prev') && <path className={`halo ${state}`} d={d} />}
+            {(state === 'err' || state === 'warn' || state === 'prev' || state === 'occ' || state === 'set') && (
+              <path className={`halo ${state}`} d={d} />
+            )}
             <path className={`trk ${state}`} d={d} />
             <path
               className="hit"
@@ -86,7 +109,7 @@ export function Schematic({ layout, highlight, selectedElement, onElementClick }
               role="button"
               aria-label={`Track section ${s.id}`}
             >
-              <title>{`${s.id} · ${s.lengthM} m`}</title>
+              <title>{highlight?.kind === 'sim' ? `${s.id}: click to occupy or clear` : `${s.id} · ${s.lengthM} m`}</title>
             </path>
             {label && (
               <text className={`lbl${state && state !== 'faded' ? ' strong' : ''}`} x={label.x} y={label.y} textAnchor="middle">
@@ -116,13 +139,16 @@ export function Schematic({ layout, highlight, selectedElement, onElementClick }
             <text className="lbl strong" x={label.x} y={label.y} textAnchor="middle">
               {p.id}
               {position ? ` ${position === 'Normal' ? 'N' : 'R'}` : ''}
+              {highlight?.kind === 'sim' && highlight.locked.has(p.id) ? ' · L' : ''}
             </text>
           </g>
         )
       })}
 
       {glyphs.map((g) => {
-        const proceed = highlight?.kind === 'route' && highlight.route.entrance === g.id
+        const proceed = highlight?.kind === 'route'
+          ? highlight.route.entrance === g.id
+          : highlight?.kind === 'sim' && highlight.clearSignals.has(g.id)
         const colour = proceed ? (g.shunt ? 'var(--vdu-set)' : 'var(--vdu-green)') : 'var(--vdu-red)'
         return (
           <g

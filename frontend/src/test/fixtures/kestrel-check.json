@@ -1,0 +1,464 @@
+{
+ "layout": {
+  "name": "Kestrel Lane Crossover (example)",
+  "sections": [
+   {
+    "id": "T31",
+    "endA": "UP-WEST",
+    "endB": "J31",
+    "lengthM": 400,
+    "line": [
+     [
+      20,
+      100
+     ],
+     [
+      150,
+      100
+     ]
+    ]
+   },
+   {
+    "id": "T32",
+    "endA": "J31",
+    "endB": "P11",
+    "lengthM": 250,
+    "line": [
+     [
+      150,
+      100
+     ],
+     [
+      300,
+      100
+     ]
+    ]
+   },
+   {
+    "id": "T33",
+    "endA": "P11",
+    "endB": "J33",
+    "lengthM": 420,
+    "line": [
+     [
+      300,
+      100
+     ],
+     [
+      600,
+      100
+     ]
+    ]
+   },
+   {
+    "id": "T34",
+    "endA": "J33",
+    "endB": "UP-EAST",
+    "lengthM": 300,
+    "line": [
+     [
+      600,
+      100
+     ],
+     [
+      740,
+      100
+     ]
+    ]
+   },
+   {
+    "id": "TX",
+    "endA": "P11",
+    "endB": "P12",
+    "lengthM": 60,
+    "line": [
+     [
+      300,
+      100
+     ],
+     [
+      400,
+      200
+     ]
+    ]
+   },
+   {
+    "id": "T40",
+    "endA": "DOWN-WEST",
+    "endB": "J40",
+    "lengthM": 300,
+    "line": [
+     [
+      20,
+      200
+     ],
+     [
+      120,
+      200
+     ]
+    ]
+   },
+   {
+    "id": "T41",
+    "endA": "J40",
+    "endB": "P12",
+    "lengthM": 380,
+    "line": [
+     [
+      120,
+      200
+     ],
+     [
+      400,
+      200
+     ]
+    ]
+   },
+   {
+    "id": "T42",
+    "endA": "P12",
+    "endB": "J42",
+    "lengthM": 240,
+    "line": [
+     [
+      400,
+      200
+     ],
+     [
+      520,
+      200
+     ]
+    ]
+   },
+   {
+    "id": "T43",
+    "endA": "J42",
+    "endB": "J43",
+    "lengthM": 600,
+    "line": [
+     [
+      520,
+      200
+     ],
+     [
+      650,
+      200
+     ]
+    ]
+   },
+   {
+    "id": "T44",
+    "endA": "J43",
+    "endB": "DOWN-EAST",
+    "lengthM": 300,
+    "line": [
+     [
+      650,
+      200
+     ],
+     [
+      740,
+      200
+     ]
+    ]
+   }
+  ],
+  "points": [
+   {
+    "id": "P11",
+    "toe": "T32",
+    "normal": "T33",
+    "reverse": "TX",
+    "linkedWith": "P12"
+   },
+   {
+    "id": "P12",
+    "toe": "T42",
+    "normal": "T41",
+    "reverse": "TX",
+    "linkedWith": "P11"
+   }
+  ],
+  "signals": [
+   {
+    "id": "S31",
+    "type": "Main",
+    "atNode": "J31",
+    "protects": "T32"
+   },
+   {
+    "id": "S33",
+    "type": "Main",
+    "atNode": "J33",
+    "protects": "T34"
+   },
+   {
+    "id": "S44",
+    "type": "Main",
+    "atNode": "J43",
+    "protects": "T43"
+   },
+   {
+    "id": "S42",
+    "type": "Main",
+    "atNode": "J42",
+    "protects": "T42"
+   },
+   {
+    "id": "S40",
+    "type": "Main",
+    "atNode": "J40",
+    "protects": "T40"
+   },
+   {
+    "id": "S30",
+    "type": "Main",
+    "atNode": "J31",
+    "protects": "T31"
+   },
+   {
+    "id": "S43",
+    "type": "Main",
+    "atNode": "J42",
+    "protects": "T43"
+   }
+  ],
+  "hasDiagram": true
+ },
+ "layoutIssues": [],
+ "routes": [
+  {
+   "id": "S31(M)-S33",
+   "entrance": "S31",
+   "exit": "S33",
+   "isShunt": false,
+   "sections": [
+    "T32",
+    "T33"
+   ],
+   "points": {
+    "P11": "Normal",
+    "P12": "Normal"
+   },
+   "linkedPoints": [
+    "P12"
+   ],
+   "overlap": [
+    "T34"
+   ],
+   "inTables": true
+  },
+  {
+   "id": "S31(M)-S43",
+   "entrance": "S31",
+   "exit": "S43",
+   "isShunt": false,
+   "sections": [
+    "T32",
+    "TX",
+    "T42"
+   ],
+   "points": {
+    "P11": "Reverse",
+    "P12": "Reverse"
+   },
+   "linkedPoints": [],
+   "overlap": [
+    "T43"
+   ],
+   "inTables": true
+  },
+  {
+   "id": "S42(M)-S30",
+   "entrance": "S42",
+   "exit": "S30",
+   "isShunt": false,
+   "sections": [
+    "T42",
+    "TX",
+    "T32"
+   ],
+   "points": {
+    "P11": "Reverse",
+    "P12": "Reverse"
+   },
+   "linkedPoints": [],
+   "overlap": [
+    "T31"
+   ],
+   "inTables": true
+  },
+  {
+   "id": "S42(M)-S40",
+   "entrance": "S42",
+   "exit": "S40",
+   "isShunt": false,
+   "sections": [
+    "T42",
+    "T41"
+   ],
+   "points": {
+    "P11": "Normal",
+    "P12": "Normal"
+   },
+   "linkedPoints": [
+    "P11"
+   ],
+   "overlap": [
+    "T40"
+   ],
+   "inTables": true
+  },
+  {
+   "id": "S44(M)-S42",
+   "entrance": "S44",
+   "exit": "S42",
+   "isShunt": false,
+   "sections": [
+    "T43"
+   ],
+   "points": {},
+   "linkedPoints": [],
+   "overlap": [
+    "T42"
+   ],
+   "inTables": true
+  }
+ ],
+ "conflicts": [
+  {
+   "routeA": "S31(M)-S33",
+   "routeB": "S31(M)-S43",
+   "sharedSections": [
+    "T32"
+   ],
+   "opposingPoints": [
+    "P11",
+    "P12"
+   ],
+   "opposing": false
+  },
+  {
+   "routeA": "S31(M)-S33",
+   "routeB": "S42(M)-S30",
+   "sharedSections": [
+    "T32"
+   ],
+   "opposingPoints": [
+    "P11",
+    "P12"
+   ],
+   "opposing": true
+  },
+  {
+   "routeA": "S31(M)-S43",
+   "routeB": "S42(M)-S30",
+   "sharedSections": [
+    "T32",
+    "T42",
+    "TX"
+   ],
+   "opposingPoints": [],
+   "opposing": true
+  },
+  {
+   "routeA": "S31(M)-S43",
+   "routeB": "S42(M)-S40",
+   "sharedSections": [
+    "T42"
+   ],
+   "opposingPoints": [
+    "P11",
+    "P12"
+   ],
+   "opposing": true
+  },
+  {
+   "routeA": "S42(M)-S30",
+   "routeB": "S42(M)-S40",
+   "sharedSections": [
+    "T42"
+   ],
+   "opposingPoints": [
+    "P11",
+    "P12"
+   ],
+   "opposing": false
+  }
+ ],
+ "tables": {
+  "fileName": "kestrel-control-tables.xlsx",
+  "rowCount": 5
+ },
+ "findings": [
+  {
+   "ruleId": "R09",
+   "ruleName": "Crossover pairing",
+   "severity": "Error",
+   "routeId": "S31(M)-S33",
+   "elements": [
+    "P11",
+    "P12"
+   ],
+   "message": "S31(M)-S33 calls P11 Normal but not P12, the other end of the same crossover. Call P12 Normal too.",
+   "source": {
+    "sheet": "Routes",
+    "row": 2,
+    "column": "PointsNormal"
+   }
+  }
+ ],
+ "rules": [
+  {
+   "id": "R01",
+   "name": "Missing route",
+   "findingCount": 0
+  },
+  {
+   "id": "R02",
+   "name": "Impossible route",
+   "findingCount": 0
+  },
+  {
+   "id": "R03",
+   "name": "Point position",
+   "findingCount": 0
+  },
+  {
+   "id": "R04",
+   "name": "Track clearance",
+   "findingCount": 0
+  },
+  {
+   "id": "R05",
+   "name": "Conflicting routes",
+   "findingCount": 0
+  },
+  {
+   "id": "R06",
+   "name": "Opposing routes",
+   "findingCount": 0
+  },
+  {
+   "id": "R07",
+   "name": "Overlap",
+   "findingCount": 0
+  },
+  {
+   "id": "R08",
+   "name": "Flank protection",
+   "findingCount": 0
+  },
+  {
+   "id": "R09",
+   "name": "Crossover pairing",
+   "findingCount": 1
+  },
+  {
+   "id": "R10",
+   "name": "Data consistency",
+   "findingCount": 0
+  }
+ ],
+ "durationMs": 8.1
+}
