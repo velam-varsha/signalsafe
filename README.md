@@ -13,6 +13,7 @@
 | [How SignalSafe works](docs/ARCHITECTURE.md) | See the big picture in diagrams, learn which file does what, and follow a suggested reading order |
 | [Testing guide](TESTING.md) | Run SignalSafe step by step, try experiments and send feedback |
 | [Web app](frontend/README.md) | Run and develop the React web app |
+| [Deploying to Azure](docs/DEPLOYMENT.md) | Put SignalSafe online with a public link |
 
 ```mermaid
 flowchart LR
@@ -149,6 +150,7 @@ src/SignalSafe.Excel         Excel import/export (ClosedXML): template, reader, 
 src/SignalSafe.Api           ASP.NET Core API: check samples or uploads, reports, OpenAPI/Swagger
 frontend/                    React + TypeScript web app (Vite): schematic, findings, routes, simulator
 docker-compose.yml           Runs the API and web app containers together
+deploy/azure-setup.sh        One-time Azure setup (Container Apps + Static Web Apps)
 tests/SignalSafe.Api.Tests   API tests (in-memory server)
 tools/make-samples.cs        Regenerates the example control tables
 .github/workflows/ci.yml     Build, format check, tests and coverage on every push

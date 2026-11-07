@@ -218,6 +218,8 @@ flowchart TD
 | API container | [`src/SignalSafe.Api/Dockerfile`](../src/SignalSafe.Api/Dockerfile) |
 | Web app container (nginx serves the page and forwards `/api`) | [`frontend/Dockerfile`](../frontend/Dockerfile), [`frontend/nginx.conf`](../frontend/nginx.conf) |
 | Start both containers together | [`docker-compose.yml`](../docker-compose.yml) |
+| Publish and deploy to Azure after CI passes | [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) |
+| One-time Azure setup | [`deploy/azure-setup.sh`](../deploy/azure-setup.sh), guide: [DEPLOYMENT.md](DEPLOYMENT.md) |
 
 ## 7. How the projects depend on each other
 

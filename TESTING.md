@@ -183,7 +183,16 @@ Open the **Simulator** tab (Westbrook sample) and try:
 
 ### Or run everything with Docker
 
-If you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running, one command starts both the API and the web app (the first build takes a few minutes):
+This needs **Docker Desktop**, which is not part of macOS. To install it (one time):
+
+1. Download **Docker Desktop for Mac** from https://www.docker.com/products/docker-desktop/. Choose **Apple Silicon** for an M1–M4 Mac (Apple menu → About This Mac shows your chip).
+2. Open the downloaded `.dmg` and drag **Docker** into **Applications**.
+3. Open **Docker** from Applications and accept the terms. Wait until the whale icon in the menu bar stops animating.
+4. Close and reopen Terminal, then check it works: `docker --version`.
+
+If Terminal says `command not found: docker`, Docker Desktop is not installed or not running yet.
+
+Then one command starts both the API and the web app (the first build takes a few minutes):
 
 ```bash
 docker compose up --build
