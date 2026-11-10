@@ -2,6 +2,8 @@
 
 This guide explains how the pieces of SignalSafe fit together, which file does what, and in what order to read the code. The diagrams are drawn by GitHub automatically.
 
+Related guides: [documentation index](README.md) · [project journey](PROJECT-JOURNEY.md) · [development workflow](WORKFLOW.md) · [deployment](DEPLOYMENT.md) · [glossary](GLOSSARY.md).
+
 ## 1. The big picture
 
 SignalSafe has one **engine** (the railway logic, in C#) and three ways to use it.
@@ -45,7 +47,15 @@ flowchart LR
 | **Excel** | A C# library that reads and writes `.xlsx` files | Keeps file formats out of the core, so the core stays simple and easy to test |
 | **Command line (CLI)** | A small program you run in Terminal | Quick checks without a browser (Weeks 1 and 2) |
 | **Web API** | A small web server that runs the engine when asked | Lets a web page (or any program) use the engine over the internet |
-| **Web app** | The page you see in the browser | The visual interface: track diagram, findings, routes |
+| **Web app** | The page you see in the browser | The visual interface: track diagram, findings, routes, simulator |
+
+The same pieces run in three places:
+
+| Where | How to start it | Web app | API |
+| --- | --- | --- | --- |
+| Your Mac, for development | Two Terminal windows (section 3) | http://localhost:5173 | http://localhost:5080 |
+| Your Mac, with Docker | `docker compose up --build` | http://localhost:8080 | http://localhost:5080 |
+| Azure (live) | Automatically, after every push that passes CI | [Live demo](https://white-ground-095510a0f.8.azurestaticapps.net/) | [API docs](https://signalsafe-api.bluedesert-a11ee586.uksouth.azurecontainerapps.io/swagger) |
 
 ## 2. Words you will see
 
@@ -64,6 +74,8 @@ flowchart LR
 | **Proxy** | In development, Vite forwards any request starting with `/api` to the API server, so the browser only talks to one address. |
 | **CORS** | A browser safety rule: a page can only call an API on another address if that API allows it. Set in `appsettings.json` for when the web app and API are hosted separately. |
 | **localhost** | Your own computer. `localhost:5080` is the API; `localhost:5173` is the web app. |
+
+More terms, including railway and cloud ones, are in the [glossary](GLOSSARY.md).
 
 ## 3. Why two Terminal windows?
 
@@ -256,9 +268,28 @@ Take these one at a time. Each step builds on the one before.
 ## 9. Try the API yourself with Swagger
 
 1. Start the API: `dotnet run --project src/SignalSafe.Api`.
-2. Open http://localhost:5080/swagger.
+2. Open http://localhost:5080/swagger. (Or use the [live API docs](https://signalsafe-api.bluedesert-a11ee586.uksouth.azurecontainerapps.io/swagger) with nothing to start.)
 3. Click **GET /api/v1/samples/{id}/check**, then **Try it out**, type `westbrook` as the id, and click **Execute**.
 4. Scroll down to see the JSON answer: the same data the web app draws.
 5. Try **POST /api/v1/check**: choose a layout file (and optionally a tables file) and click **Execute**.
 
 This is a good way to understand what the web app receives, and it is often asked about in interviews ("how did you test your API?").
+
+## 10. Running in the cloud
+
+The live site uses the same containers as Docker on your Mac, hosted on Azure and updated automatically by GitHub Actions:
+
+```mermaid
+flowchart LR
+    push(["git push"]) --> ci["CI<br/>tests + Docker build"]
+    ci -- "passed" --> deploy["Deploy"]
+    deploy --> aca["Azure Container Apps<br/>API container"]
+    deploy --> swa["Azure Static Web Apps<br/>web app files"]
+    browser(["Visitor"]) --> swa
+    browser -- "API calls" --> aca
+```
+
+| Topic | Read |
+| --- | --- |
+| What each Azure service does, costs, the free credit, credentials, troubleshooting | [DEPLOYMENT.md](DEPLOYMENT.md) |
+| How to make a change and get it live, how to roll back | [WORKFLOW.md](WORKFLOW.md) |

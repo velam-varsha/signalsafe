@@ -11,14 +11,18 @@ Hosted on Azure (Static Web Apps + Container Apps). The API sleeps when idle, so
 
 > Portfolio project. All layouts and tables in this repository are invented examples. SignalSafe is an advisory design-checking aid, **not** a certified safety system, and does not replace independent checking or formal verification.
 
-## Guides
+## Documentation
 
 | Guide | Read it to... |
 | --- | --- |
-| [How SignalSafe works](docs/ARCHITECTURE.md) | See the big picture in diagrams, learn which file does what, and follow a suggested reading order |
-| [Testing guide](TESTING.md) | Run SignalSafe step by step, try experiments and send feedback |
+| [Documentation index](docs/README.md) | Find the right guide, with a suggested reading order |
+| [The SignalSafe journey](docs/PROJECT-JOURNEY.md) | Understand how the project was built, step by step, and why each step matters |
+| [How SignalSafe works](docs/ARCHITECTURE.md) | See the big picture in diagrams, which file does what, and a code reading order |
+| [Testing guide](TESTING.md) | Try it (live or on your machine), run the tests and experiments, send feedback |
+| [Development workflow](docs/WORKFLOW.md) | Make a change and get it onto the live site; roll back; add a rule or sample |
+| [Deployment](docs/DEPLOYMENT.md) | How it runs on Azure, the pipeline, costs, the free credit, maintenance |
+| [Glossary](docs/GLOSSARY.md) | Railway, software and cloud terms in plain English |
 | [Web app](frontend/README.md) | Run and develop the React web app |
-| [Deploying to Azure](docs/DEPLOYMENT.md) | Put SignalSafe online with a public link |
 
 ```mermaid
 flowchart LR
@@ -27,7 +31,25 @@ flowchart LR
     api --> engine["Engine<br/>C#: routes, conflicts, 10 rules<br/>+ Excel import/export"]
 ```
 
+## Tech stack
+
+| Layer | Technology |
+| --- | --- |
+| Engine | C# 14, .NET 10 class libraries |
+| Excel | ClosedXML |
+| API | ASP.NET Core minimal APIs, OpenAPI, Swagger UI |
+| Web app | React 19, TypeScript, Vite, SVG |
+| Tests | xUnit, FluentAssertions, WebApplicationFactory, Vitest, Testing Library |
+| Quality | `dotnet format`, .NET analyzers (warnings as errors), oxlint, code coverage |
+| Packaging | Docker (multi-stage builds), docker compose, nginx |
+| CI/CD | GitHub Actions: CI on every push, deploy after CI passes on `main` |
+| Hosting | Azure Container Apps (API), Azure Static Web Apps (web app), GitHub Container Registry (images) |
+
+**Quality at a glance:** 109 automated tests (72 engine, 14 API, 23 web app), about 95% engine line coverage, and a 500-route layout checked in well under a second.
+
 ## Status
+
+All four phases are complete. The [project journey](docs/PROJECT-JOURNEY.md) explains what each one involved and why.
 
 | Phase | Scope | Status |
 | --- | --- | --- |
@@ -84,6 +106,13 @@ These are deliberate for the MVP and will be refined:
 - A signal reading towards a line end or buffer stop, with no signal beyond, starts no route.
 
 ## Run it
+
+| Option | Needs | Best for |
+| --- | --- | --- |
+| [Live demo](https://white-ground-095510a0f.8.azurestaticapps.net/) | A browser | Trying it |
+| Docker (below) | Docker Desktop | Running the whole app with one command |
+| Two terminals (below) | .NET 10 SDK, Node.js 22 | Developing and changing the code |
+| Command line (below) | .NET 10 SDK | Checking files quickly, scripting |
 
 ### Everything with Docker (one command)
 
@@ -154,13 +183,15 @@ src/SignalSafe.Core          Core engine (no web, UI or file-format code)
 src/SignalSafe.Excel         Excel import/export (ClosedXML): template, reader, findings report
 src/SignalSafe.Api           ASP.NET Core API: check samples or uploads, reports, OpenAPI/Swagger
 frontend/                    React + TypeScript web app (Vite): schematic, findings, routes, simulator
+tests/SignalSafe.Core.Tests  Engine and Excel tests (xUnit)
+tests/SignalSafe.Api.Tests   API tests (in-memory server)
+samples/                     Invented example layouts, control tables and the blank template
+tools/make-samples.cs        Regenerates the example control tables
 docker-compose.yml           Runs the API and web app containers together
 deploy/azure-setup.sh        One-time Azure setup (Container Apps + Static Web Apps)
-tests/SignalSafe.Api.Tests   API tests (in-memory server)
-tools/make-samples.cs        Regenerates the example control tables
-.github/workflows/ci.yml     Build, format check, tests and coverage on every push
-tests/SignalSafe.Core.Tests  xUnit tests
-samples/                     Invented example layouts
+.github/workflows/ci.yml     CI: build, format check, tests, coverage, Docker build on every push
+.github/workflows/deploy.yml Deploy: publish the API image and release to Azure after CI passes
+docs/                        Guides: journey, architecture, workflow, deployment, glossary
 ```
 
 ## Roadmap: how SignalSafe can grow

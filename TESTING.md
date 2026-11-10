@@ -1,6 +1,22 @@
 # Testing SignalSafe
 
-This guide shows how to run SignalSafe on your own machine, try it on the sample layouts, and send feedback.
+This guide shows how to try SignalSafe, run its tests, use it on the sample layouts, and send feedback.
+
+| You want to... | Go to |
+| --- | --- |
+| Try it in a browser with nothing installed | [0. Try the live site](#0-try-the-live-site) |
+| Run the automated tests | [2. Run the automated tests](#2-run-the-automated-tests) |
+| Use the command line | [3](#3-check-a-layout-with-the-command-line-tool) and [4b](#4b-check-control-tables-against-a-layout) |
+| Run the web app on your Mac | [4c. Try the web app](#4c-try-the-web-app) |
+| Break things on purpose | [5. Experiments to try](#5-experiments-to-try) |
+
+## 0. Try the live site
+
+Open the **[live demo](https://white-ground-095510a0f.8.azurestaticapps.net/)**. If nobody has used it recently, the first load takes 10–20 seconds while the API starts on Azure. Everything in [section 4c](#4c-try-the-web-app) (findings, routes, simulator, upload, downloads) works there too.
+
+The live **[API documentation](https://signalsafe-api.bluedesert-a11ee586.uksouth.azurecontainerapps.io/swagger)** lets you try each endpoint from the browser (see [ARCHITECTURE.md section 9](docs/ARCHITECTURE.md#9-try-the-api-yourself-with-swagger)).
+
+The live site always runs the latest version of `main` that passed all tests (see [WORKFLOW.md](docs/WORKFLOW.md)).
 
 ## 1. One-time setup
 
@@ -36,7 +52,25 @@ git pull
 dotnet test
 ```
 
-Expected: `Passed! - Failed: 0` and the total number of tests. Any `Failed` line is a bug: copy the whole output into your feedback.
+Expected: `Passed! - Failed: 0` for both test projects (72 engine tests and 14 API tests). Any `Failed` line is a bug: copy the whole output into your feedback.
+
+The web app has its own tests (needs Node.js, see section 4c):
+
+```bash
+cd frontend && npm install && npm test
+```
+
+Expected: `23 passed`.
+
+### What the automated tests cover
+
+| Test project | Count | Covers |
+| --- | --- | --- |
+| `tests/SignalSafe.Core.Tests` | 72 | Layout loading and validation, route search, conflicts, crossovers, flank protection, every rule (plant one mistake, expect one finding), Excel import/export, sample findings, a 500-route speed test |
+| `tests/SignalSafe.Api.Tests` | 14 | Every API endpoint, run in memory: samples, uploads, wrong file types, broken JSON, reports, OpenAPI |
+| `frontend` (Vitest) | 23 | Drawing maths, the findings and routes panels, diagram highlighting, the simulator logic and the simulator on the page |
+
+Coverage of the engine is about 95% of lines. GitHub runs all of these on every push (see [WORKFLOW.md](docs/WORKFLOW.md#step-5-watch-ci-and-deploy)).
 
 ## 3. Check a layout with the command-line tool
 
@@ -253,6 +287,7 @@ Copy this into a message:
 
 ```
 Test date:
+Where tested (live site / Mac with two terminals / Mac with Docker):
 dotnet test result (pass/fail, number of tests):
 
 Westbrook output correct? yes / no, details:

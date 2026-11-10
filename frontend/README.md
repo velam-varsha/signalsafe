@@ -22,6 +22,16 @@ Open http://localhost:5173. In development, Vite forwards `/api` requests to the
 
 To use an API hosted elsewhere, set `VITE_API_URL` (for example in `.env.local`) and add the web app's address to the API's `Cors:AllowedOrigins` setting.
 
+## How it is built and hosted
+
+| Where | How the web app is served | How it reaches the API |
+| --- | --- | --- |
+| Development (`npm run dev`) | Vite dev server on http://localhost:5173 | Vite forwards `/api` to http://localhost:5080 (see `vite.config.ts`) |
+| Docker (`docker compose up`) | nginx in a container on http://localhost:8080 (see `Dockerfile`, `nginx.conf`) | nginx forwards `/api` to the API container |
+| Azure (live) | Azure Static Web Apps (see `public/staticwebapp.config.json`) | Calls the API's full address, built in with `VITE_API_URL`; the API allows it with CORS |
+
+`npm run build` writes plain files to `dist/`. The Deploy workflow builds them with `VITE_API_URL` set to the live API address and uploads them to Static Web Apps. `staticwebapp.config.json` sends unknown paths back to `index.html` and adds two security headers. See [docs/DEPLOYMENT.md](../docs/DEPLOYMENT.md) for the whole pipeline.
+
 ## Scripts
 
 | Command | What it does |
@@ -36,7 +46,8 @@ To use an API hosted elsewhere, set `VITE_API_URL` (for example in `.env.local`)
 ```
 src/api/          API types and client
 src/diagram/      Drawing maths: signal placement, labels, view box
-src/components/   Schematic (SVG), findings panel, routes panel
+src/components/   Schematic (SVG), findings, routes and simulator panels
+src/sim/          Interlocking simulator logic (set, lock, refuse, occupy)
 src/App.tsx       Page layout and state
 src/test/         Test setup and API response fixtures
 ```
