@@ -18,6 +18,7 @@ Hosted on Azure (Static Web Apps + Container Apps). The API sleeps when idle, so
 | [Documentation index](docs/README.md) | Find the right guide, with a suggested reading order |
 | [The SignalSafe journey](docs/PROJECT-JOURNEY.md) | Understand how the project was built, step by step, and why each step matters |
 | [How SignalSafe works](docs/ARCHITECTURE.md) | See the big picture in diagrams, which file does what, and a code reading order |
+| [The checks (rules R01–R10)](docs/RULES.md) | Every rule and layout check in detail, with examples and simplifications |
 | [Testing guide](TESTING.md) | Try it (live or on your machine), run the tests and experiments, send feedback |
 | [Development workflow](docs/WORKFLOW.md) | Make a change and get it onto the live site; roll back; add a rule or sample |
 | [Deployment](docs/DEPLOYMENT.md) | How it runs on Azure, the pipeline, costs, the free credit, maintenance |
@@ -84,6 +85,8 @@ All four phases are complete. The [project journey](docs/PROJECT-JOURNEY.md) exp
 | R10 | Data consistency | no unknown IDs (with "did you mean" hints), duplicates or unreadable cells | Warning |
 
 Rows are matched to derived routes by entrance and exit signal, so a designer's own route names work. Each rule is one class in [`src/SignalSafe.Core/Rules`](src/SignalSafe.Core/Rules).
+
+**Full details** of every rule (what it checks, why it matters, how the correct answer is worked out, example findings) and the 13 layout checks are in **[docs/RULES.md](docs/RULES.md)**.
 
 ## Sample layouts
 

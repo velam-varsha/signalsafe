@@ -169,7 +169,7 @@ Every rule follows the same pattern, so adding one is mechanical.
 3. **Register it** in `RuleEngine.DefaultRules` in [`RuleEngine.cs`](../src/SignalSafe.Core/Rules/RuleEngine.cs).
 4. **Test it** in [`RuleTests.cs`](../tests/SignalSafe.Core.Tests/Rules/RuleTests.cs): draft correct tables (no findings), plant one mistake, expect exactly one `R11` finding.
 5. **Run** `dotnet test`. Some existing tests count rules (e.g. "10 rules" in the API tests); update those numbers.
-6. **Update the docs**: the rules table in the [README](../README.md#the-10-rules).
+6. **Update the docs**: add a section to [RULES.md](RULES.md) and a line to the rules table in the [README](../README.md#the-10-rules).
 7. **Commit and push.** The web app shows the new rule automatically, because it lists whatever rules the API returns.
 
 ## Worked example: adding a new sample layout

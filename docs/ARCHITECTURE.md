@@ -177,6 +177,7 @@ flowchart TD
 | Rules R01–R04 (routes, points, track clearance) | [`Rules/RouteRules.cs`](../src/SignalSafe.Core/Rules/RouteRules.cs) |
 | Rules R05–R09 (conflicts, opposing, overlap, flank, crossover) | [`Rules/LockingRules.cs`](../src/SignalSafe.Core/Rules/LockingRules.cs) |
 | Rule R10 (unknown IDs, "did you mean" hints) | [`Rules/DataConsistencyRule.cs`](../src/SignalSafe.Core/Rules/DataConsistencyRule.cs) |
+| What every rule and layout check means, with examples | [RULES.md](RULES.md) |
 
 ### Excel: `src/SignalSafe.Excel`
 
