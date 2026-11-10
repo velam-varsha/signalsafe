@@ -1,6 +1,11 @@
 # SignalSafe
 
 [![CI](https://github.com/velam-varsha/signalsafe/actions/workflows/ci.yml/badge.svg)](https://github.com/velam-varsha/signalsafe/actions/workflows/ci.yml)
+[![Deploy](https://github.com/velam-varsha/signalsafe/actions/workflows/deploy.yml/badge.svg)](https://github.com/velam-varsha/signalsafe/actions/workflows/deploy.yml)
+
+**[Live demo](https://white-ground-095510a0f.8.azurestaticapps.net/)** · **[API documentation (Swagger)](https://signalsafe-api.bluedesert-a11ee586.uksouth.azurecontainerapps.io/swagger)**
+
+Hosted on Azure (Static Web Apps + Container Apps). The API sleeps when idle, so the first load can take 10–20 seconds.
 
 **A spell-checker for railway signalling data.** SignalSafe reads a track layout, works out every route the layout allows, and checks the designer's control tables against it to find missing routes, wrong point positions, unlisted conflicts and missing overlaps.
 
@@ -29,7 +34,7 @@ flowchart LR
 | Week 1 | Core model, layout validation, route search, conflicts | Done (31 tests, 96% line coverage) |
 | Week 2 | Excel control table import, rules R01–R10, Excel findings report | Done (67 tests, 94% line coverage) |
 | Week 3 | ASP.NET Core API, React + TypeScript web app with interactive schematic | Done (86 .NET + 13 web tests) |
-| Week 4 | Route simulator, Docker, CI/CD, public deployment | Simulator and Docker done; deployment next |
+| Week 4 | Route simulator, Docker, CI/CD, public deployment | Done: live on Azure, deployed automatically after CI |
 
 ## How it works
 
