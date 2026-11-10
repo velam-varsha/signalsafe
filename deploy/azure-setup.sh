@@ -11,7 +11,9 @@ set -euo pipefail
 
 RESOURCE_GROUP="${RESOURCE_GROUP:-signalsafe-rg}"
 LOCATION="${LOCATION:-uksouth}"          # where the API runs
-WEB_LOCATION="${WEB_LOCATION:-westeurope}" # Static Web Apps Free is offered in a few regions only
+# Static Web Apps is offered in a few regions only, and some may not accept new free-trial customers.
+# The script tries them in this order. The page itself is served worldwide, so the region hardly matters.
+WEB_LOCATIONS="${WEB_LOCATIONS:-eastus2 centralus westus2 eastasia westeurope}"
 ENVIRONMENT="signalsafe-env"
 API_APP="signalsafe-api"
 WEB_APP="signalsafe-web"
@@ -51,9 +53,22 @@ if ! az containerapp show -n "$API_APP" -g "$RESOURCE_GROUP" -o none 2>/dev/null
 fi
 API_URL="https://$(az containerapp show -n "$API_APP" -g "$RESOURCE_GROUP" --query properties.configuration.ingress.fqdn -o tsv)"
 
-step "Static Web App $WEB_APP (Free plan, $WEB_LOCATION)"
+step "Static Web App $WEB_APP (Free plan)"
 if ! az staticwebapp show -n "$WEB_APP" -g "$RESOURCE_GROUP" -o none 2>/dev/null; then
-  az staticwebapp create -n "$WEB_APP" -g "$RESOURCE_GROUP" -l "$WEB_LOCATION" --sku Free -o none
+  created=""
+  for region in $WEB_LOCATIONS; do
+    echo "Trying region $region..."
+    if az staticwebapp create -n "$WEB_APP" -g "$RESOURCE_GROUP" -l "$region" --sku Free -o none --only-show-errors; then
+      created="$region"
+      break
+    fi
+    echo "Region $region is not available for this account, trying the next one."
+  done
+  if [ -z "$created" ]; then
+    echo "No Static Web Apps region accepted the request. See docs/DEPLOYMENT.md (Troubleshooting)." >&2
+    exit 1
+  fi
+  echo "Created in $created."
 fi
 WEB_URL="https://$(az staticwebapp show -n "$WEB_APP" -g "$RESOURCE_GROUP" --query defaultHostname -o tsv)"
 WEB_TOKEN="$(az staticwebapp secrets list -n "$WEB_APP" -g "$RESOURCE_GROUP" --query properties.apiKey -o tsv)"

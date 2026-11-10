@@ -14,7 +14,7 @@ flowchart LR
     ghcr --> aca
     subgraph azure["Azure: resource group signalsafe-rg"]
         aca["Container Apps<br/>signalsafe-api<br/>scales to zero when idle"]
-        swa["Static Web Apps (Free)<br/>signalsafe-web"]
+        swa["Static Web Apps (Free)<br/>signalsafe-web<br/>served worldwide"]
     end
     visitor(["Visitor's browser"]) --> swa
     visitor -- "API calls (CORS)" --> aca
@@ -97,6 +97,7 @@ From now on this happens automatically after every push to `main` that passes CI
 | --- | --- |
 | The page says it cannot reach the API | Wait 20 seconds and reload (the API was asleep). If it persists, check `API_URL` has no trailing `/` and that `<API_URL>/health` shows `{"status":"ok"}` |
 | Setup script: image cannot be pulled | The package is still private: redo Step 3, then run the script again |
+| Setup script: "The selected region is currently not accepting new customers" | Azure has no free-trial capacity in that region. The script tries several Static Web Apps regions in turn; just run it again. For the API region, run it with another location, e.g. `curl -fsSL <script URL> \| LOCATION=westeurope bash` |
 | Setup script: `ad sp create-for-rbac` permission error | Your account needs to be the subscription owner; with a personal free account it is |
 | Deploy job: `Login failed` | Re-create the `AZURE_CREDENTIALS` secret with the full JSON block, braces included |
 | Deploy jobs are skipped | The variable `AZURE_DEPLOY` must be exactly `true` |
